@@ -58,6 +58,15 @@ Runs on a server you own. Works with Claude on the website, the phone app, the d
 > [!NOTE]
 > Works with Cloudflare Zero Trust, SearXNG, Chromium and Claude. Not made by or affiliated with any of them.
 
+<table align="center">
+  <tr>
+    <td align="center"><img src="docs/images/log.png" alt="The Log tab: a list of what the AI did today, with times, such as opened rail.example.com and stopped before payment." width="400"><br><sub>The <b>Log</b> tab: what the AI did, site names only</sub></td>
+    <td align="center"><img src="docs/images/settings.png" alt="The Self-test on the Settings tab: 12 of 12 checks passed, with a green dot next to each check." width="400"><br><sub>The <b>Self-test</b> on your <b>Settings</b> tab</sub></td>
+  </tr>
+</table>
+
+<p align="center"><sub>Pictures of the real page, filled with sample data.</sub></p>
+
 ## What it is
 
 Shared-Browser-MCP is one connector that gives your AI app three things: web search with your own private search engine, a reader that turns pages and PDFs into clean text, and a shared browser on your server (Chromium). You and the AI use the same browser. You watch it live on your own page, from your phone or your computer, and you can take over at any time.
@@ -73,6 +82,8 @@ AI:   (searches, then opens the train company's site in the shared browser)
 You:  (signs in on your page, presses Done)
 AI:   The cheapest is the 7:04 at 29 euros. I stopped before the payment page.
 ```
+
+<p align="center"><img src="docs/images/chat.png" alt="An example chat: the AI searches, opens a train site, asks you to sign in, then reports the cheapest train and stops before payment." width="520"></p>
 
 ## Safety and privacy
 
@@ -137,6 +148,8 @@ Details in [docs/how-it-works.md](docs/how-it-works.md).
 > Server panels such as Coolify work too: use `docker-compose.server.yml` as a raw compose deployment. See [setup-own-server.md](docs/setup-own-server.md#using-a-server-panel-such-as-coolify).
 
 ## What it can do
+
+<p align="center"><img src="docs/images/browser.png" alt="Your Browser tab: a blue bar says Claude asks you to sign in to the train site and has a Done button. Below it, the shared browser shows a sample train site with a sign-in box." width="800"></p>
 
 25 tools, in four groups. Full list in [docs/tools.md](docs/tools.md).
 
@@ -234,7 +247,7 @@ The full guide with every click is [docs/setup-own-server.md](docs/setup-own-ser
 ## Not supported yet
 
 - **A lock for your page without Cloudflare.** The page has no login of its own and relies on Zero Trust. See the [roadmap](docs/roadmap.md).
-- **Screenshots and a demo in this README.** The public release has been tested on a fresh machine without Cloudflare, so there is no real setup to take pictures of yet.
+- **A demo video.** The pictures here use the real page with sample data. A video needs a real setup behind Cloudflare, which comes later.
 - **More than one person.** It is built for one owner: one passphrase, one shared browser.
 - **Tested AI apps other than Claude.** Others that support remote MCP with OAuth may work, but nobody has tested them yet.
 - **Video, GIF and PDF capture** of the shared browser. Not built yet. The AI can take still screenshots of a page instead.

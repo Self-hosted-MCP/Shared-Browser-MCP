@@ -47,9 +47,9 @@ async def door() -> list[dict]:
             detail = "on" if ok else ("on but the team domain or audience tag is missing" if not access.configured() else f"on but answered {r.status_code} without a token")
         else:
             ok, detail = local, "off (fine on a Mac)" if local else "OFF on a public address: set ACCESS_ENFORCE=1"
-        out.append(row("Zero Trust second lock on the user's page", ok, detail))
+        out.append(row("Zero Trust second lock on your page", ok, detail))
     except Exception as exc:
-        out.append(row("Zero Trust second lock on the user's page", False, type(exc).__name__))
+        out.append(row("Zero Trust second lock on your page", False, type(exc).__name__))
     return out
 
 
