@@ -73,3 +73,5 @@ All of these can be changed, see [settings.md](settings.md#advanced).
 ## Asking first
 
 The five tools marked "Yes" are marked as tools that change something. Your AI app asks you before each call, in the app itself. Pausing on your page stops every browser tool at once, wherever you are.
+
+What next: [things to ask](examples.md).

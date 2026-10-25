@@ -92,7 +92,8 @@ A change that weakens one needs a very good reason and a test.
 - **New setting:** add it to `config.py`, the compose files, `.env.example` and `docs/settings.md`. The docs test checks the last two.
 - **New tool:** honest annotations (read only, or destructive), then `docs/tools.md`. The docs test checks it.
 - Changing what people see: update the matching page in `docs/` in the same change, and add a line to `CHANGELOG.md`.
-- Images: `images.yml` builds all six for `linux/amd64` and `linux/arm64` on every push to `main` and publishes them to `ghcr.io/self-hosted-mcp`. Keep base images pinned by digest.
+- Users in the images: `browser` and `mcp` run as non-root users. `dns` (Unbound listens on port 53), `egress` (its start script writes the block list, then Squid drops to the `proxy` user) and `front` (nginx's own setup) start as root on purpose. Change that only together with the compose file and a run of the **Stack test**.
+- Images: `images.yml` builds all six for `linux/amd64` and `linux/arm64` only when a release is published (or by hand with a release tag), and publishes them to `ghcr.io/self-hosted-mcp` with the tags `X.Y.Z`, `X.Y` and `latest`, provenance and an SBOM. Keep base images pinned by digest.
 - If you change a network address, change it everywhere: both compose files, `egress/squid.conf` (`wall_net`) and the DNS address `10.88.251.53`.
 - Don't add a database or new runtime dependencies without a strong reason.
 

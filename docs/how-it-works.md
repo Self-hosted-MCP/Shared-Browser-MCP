@@ -58,3 +58,5 @@ flowchart LR
 ## The code
 
 The MCP server is Python, in `mcp/src/sbmcp/`. Each of the six pieces has its own folder and its own image. [AGENTS.md](../AGENTS.md) has the map.
+
+What next: [how it stays safe](safety.md).

@@ -154,6 +154,14 @@ Follow [connect-your-ai.md](connect-your-ai.md). In short: press **Allow a new a
 
 Panels that run a Docker Compose file work. Use `docker-compose.server.yml` as a **raw** compose deployment and turn off the panel's own proxy and domains for it: the stack needs its own sealed network, which a panel's shared proxy network would break. Put the settings in the panel's environment settings (in Coolify, switch **Is Literal** on for secrets). The file `browser/seccomp.json` is read from the repository folder, so the panel must keep the repository on the server.
 
+## Behind your own reverse proxy
+
+If you already run a reverse proxy (Caddy, nginx, Traefik) with HTTPS, you can point the door's address at `http://127.0.0.1:8765` with it instead of using a Cloudflare tunnel for that address. Your page is different: it still has to go through Cloudflare Zero Trust, because the app checks Cloudflare's signed token on every page and admin call and refuses everything else. Never point any address at port `8766`.
+
+## Without Docker
+
+Not supported. The stack is six programs (search, DNS, the wall, the browser, your page and the door) that depend on Docker's private networks to keep the browser away from your server. Running them by hand would remove that wall.
+
 ## Backups
 
 The volumes that matter are `mcp-data` (settings, connected apps, action log) and `browser-profile` (your sign-ins in the shared browser). Everything else can be rebuilt. Your secrets are in `.env`: keep a copy in your password manager.
@@ -167,5 +175,7 @@ The volumes that matter are `mcp-data` (settings, connected apps, action log) an
 ## What we tested
 
 - The stack this release comes from ran on an ARM server (Ubuntu, Docker Compose through a server panel) behind a Cloudflare tunnel and Zero Trust, with Claude on the website, the phone app and Claude Code, in October 2026. Its Self-test passed every check.
-- This public release (0.1.0) changes the setup for anyone: no personal services, `SERVER_PUBLIC_IP`, images for Intel/AMD and ARM. **It has not been run end to end yet.** The images are built and the compose files checked by GitHub Actions on every change.
-- Not tested: an Intel/AMD server, other AI apps than Claude.
+- This public release (0.1.0) was built from scratch and started on a fresh Ubuntu 24.04 machine (Intel/AMD, GitHub Actions) on 25 October 2026, without Cloudflare (`ACCESS_ENFORCE=0`). All 16 checks in `scripts/smoke-test.sh` passed, and the images were built for Intel/AMD and ARM.
+- Not tested with this release: a full server setup behind Cloudflare, other AI apps than Claude.
+
+What next: [connect your AI app](connect-your-ai.md).

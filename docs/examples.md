@@ -23,3 +23,5 @@ For ideas once your AI app is connected. Each example names the tools the AI wil
 
 - *How fast is example.com on mobile, and what are the three biggest fixes?* (`pagespeed_check`)
 - *Run the self test and tell me if anything fails.* (`self_test`)
+
+What next: [the tools the AI can use](tools.md).

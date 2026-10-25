@@ -14,7 +14,13 @@ For when you want to see it working before you set up a server. You end with the
 ## 1. Get the code
 
 ```bash
-git clone https://github.com/Self-hosted-MCP/Shared-Browser-MCP.git && cd Shared-Browser-MCP
+git clone https://github.com/Self-hosted-MCP/Shared-Browser-MCP.git
+```
+
+You should see a new folder called `Shared-Browser-MCP`. Go into it:
+
+```bash
+cd Shared-Browser-MCP
 ```
 
 ## 2. Make your settings
@@ -72,6 +78,35 @@ claude mcp add --transport http shared-browser http://localhost:8765/mcp
 
 Log in with your passphrase when your browser opens the login page.
 
+## Keep it running
+
+The containers restart by themselves after a crash or a restart of Docker (`restart: unless-stopped`). If Docker Desktop is closed, the stack stops with it. Start Docker Desktop again and it comes back.
+
+## Where things are
+
+| What | Where |
+|---|---|
+| Your settings | `.env.local` in the project folder |
+| Your page | `http://localhost:8081` |
+| The door for AI apps | `http://localhost:8765/mcp` |
+| Settings, connected apps, action log | The Docker volume `mcp-data` |
+| Your sign-ins in the shared browser | The Docker volume `browser-profile` |
+| Downloads and uploads | The Docker volumes `downloads` and `uploads` |
+
+## Update
+
+Get the newest code, then rebuild:
+
+```bash
+git pull
+```
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.local.yml --env-file .env.local up -d --build
+```
+
+More in [updates.md](updates.md).
+
 ## Stop or remove it
 
 Stop it:
@@ -89,4 +124,6 @@ docker compose -f docker-compose.yml -f docker-compose.local.yml down -v
 ## What we tested
 
 - The stack this release comes from was built and tested on a Mac with Docker, including a real Claude Code login, in October 2026.
-- This public release (0.1.0) has not been run on a computer yet. Its compose files are checked by GitHub Actions on every change.
+- This public release (0.1.0) was built and started the same way on a fresh Ubuntu 24.04 machine (GitHub Actions) on 25 October 2026. All 16 checks in `scripts/smoke-test.sh` passed. It has not been run on a Mac or Windows yet.
+
+What next: [set it up on your server](setup-own-server.md).

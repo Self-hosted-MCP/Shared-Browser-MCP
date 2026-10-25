@@ -2,7 +2,7 @@
 
 For when you want to know exactly what leaves your server, and what is kept.
 
-Nothing is collected by this project. No account with us, no telemetry, no tracking.
+This project collects nothing. No account with us, no telemetry, no tracking.
 
 ## What leaves your server
 
@@ -14,6 +14,19 @@ Nothing is collected by this project. No account with us, no telemetry, no track
 | `www.cloudflare.com` and `api.ivpn.net` | When your page shows its security facts | A lookup of your server's own public address and its country. |
 | Google PageSpeed | Only when the AI calls `pagespeed_check` | The address being checked. |
 | Cloudflare | Every visit to your two addresses | Cloudflare runs the tunnel and Zero Trust, so it sees that traffic. |
+
+## Encryption at a glance
+
+| Part | Encrypted? |
+|---|---|
+| Your browser and your AI app to Cloudflare | Yes, HTTPS |
+| Cloudflare to your server | Yes, through the Cloudflare tunnel |
+| Between the six containers on your server | No, plain HTTP on private Docker networks that only these containers share |
+| The shared browser to websites | Yes, when the site uses HTTPS |
+| DNS lookups from your server | No, they go to your server's own DNS like any program on it |
+| Your passphrase | Never stored, only a slow hash (PBKDF2) in `LOGIN_HASH` |
+| Tokens of connected apps | Stored as hashes |
+| Volumes on disk (sign-ins, files, the log) | Not by this project. Use your server's disk encryption if you need it |
 
 ## What the AI app sees
 
@@ -37,3 +50,5 @@ The containers write short logs (Docker keeps up to 30 MB per container). They h
 ## Deleting everything
 
 `docker compose -f docker-compose.server.yml down -v` on the server deletes every container and volume: settings, the log, files, sign-ins. Then remove the two addresses and Zero Trust applications in Cloudflare.
+
+What next: [what it can't protect against](threat-model.md).

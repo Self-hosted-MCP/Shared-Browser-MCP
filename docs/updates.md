@@ -4,7 +4,7 @@ For when you want the newest fixes. Chromium gets security fixes often, so updat
 
 ## Know when there's an update
 
-On GitHub, press **Watch**, **Custom**, **Releases**. You get a message for each release. The images tagged `latest` change with every change to `main`.
+On GitHub, press **Watch**, **Custom**, **Releases**. You get a message for each release. The images are only built for releases: `latest` always means the newest release.
 
 ## Update by hand
 
@@ -43,3 +43,5 @@ Use the version tag of the release you want, as above, then `docker compose -f d
 ## What an update never touches
 
 Your volumes: settings, connected apps, the action log, your files and your sign-ins in the shared browser. Your `.env` stays as it is.
+
+What next: [if something goes wrong](troubleshooting.md).

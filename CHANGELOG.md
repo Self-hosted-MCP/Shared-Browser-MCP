@@ -7,10 +7,6 @@ All notable changes to this project. Newest first.
 First public release.
 
 - 25 tools for your AI app: private web search (SearXNG), a page and PDF reader, and a shared Chromium you can watch and take over.
-- Your own page with four tabs: **Browser** (live view), **Log**, **Files** and **Settings**.
-- Passphrase login for AI apps, with a pairing window so a new app can only connect while you allow it.
-- A filter (Squid) as the browser's only way out, which refuses private networks.
-- A private DNS for the whole stack that never logs and blocks known bad sites.
-- `SERVER_PUBLIC_IP` keeps the browser from reaching your server through its public address.
-- Images for Intel/AMD and ARM servers, published to `ghcr.io/self-hosted-mcp`.
-- A **Self-test** on the Settings tab and as the `self_test` tool.
+- Your own page (**Browser**, **Log**, **Files**, **Settings**) behind Cloudflare Zero Trust, and a passphrase login with a pairing window for AI apps.
+- A wall around the browser: a filter that refuses private networks and your server's own address, and a private DNS that never logs.
+- Images for Intel/AMD and ARM servers on `ghcr.io/self-hosted-mcp`, and a **Self-test** you can run from the page.

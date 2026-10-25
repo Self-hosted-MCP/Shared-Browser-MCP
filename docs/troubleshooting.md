@@ -51,3 +51,5 @@ Some sites only build their page with JavaScript. The AI can open it in the shar
 ## Still stuck?
 
 Open an issue with the [bug form](https://github.com/Self-hosted-MCP/Shared-Browser-MCP/issues/new?template=bug_report.yml). Paste the Self-test result (the **Copy** button), without secrets.
+
+What next: [questions people ask](faq.md).

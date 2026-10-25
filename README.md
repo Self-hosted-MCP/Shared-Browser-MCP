@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/images/icon.svg" alt="" width="88"></p>
+<p align="center"><img src="docs/images/icon.png" alt="" width="88"></p>
 
 <h1 align="center">Shared-Browser-MCP</h1>
 
@@ -22,6 +22,8 @@ Runs on a server you own. Works with Claude on the website, the phone app, the d
   <a href="#safety-and-privacy"><img src="https://img.shields.io/badge/telemetry-none-0B0D12" alt="No telemetry"></a>
   <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-5AC8FA" alt="Pull requests welcome"></a>
 </p>
+
+<p align="center">Free and open source under the Apache License 2.0. Use it, fork it and change it, share your changes, and keep the credit.</p>
 
 <p align="center">
   <a href="#quick-start-about-45-minutes">Quick start</a> ·
@@ -90,6 +92,8 @@ More in [safety](docs/safety.md), [privacy](docs/privacy.md) and the [threat mod
 
 ## How it works, in one picture
 
+Your AI app talks to the door. You talk to your page. Both reach the same shared Chrome, which only gets out to the internet through the wall.
+
 ```mermaid
 flowchart LR
   AI["Your AI app"] -->|"passphrase login"| MCP["door (mcp)"]
@@ -101,7 +105,7 @@ flowchart LR
   BR --> EG["the wall"] --> NET["the internet"]
 ```
 
-Your AI app talks to the door. You talk to your page. Both reach the same shared Chrome, which only gets out to the internet through the wall. Details in [docs/how-it-works.md](docs/how-it-works.md).
+Details in [docs/how-it-works.md](docs/how-it-works.md).
 
 ## Words you'll see
 
@@ -148,10 +152,16 @@ You run it yourself, and nothing goes through our servers. It has one owner per 
 
 The full guide with every click is [docs/setup-own-server.md](docs/setup-own-server.md). In short:
 
-1. On your server, get the code:
+1. On your server, get the code. You should see a new folder called `Shared-Browser-MCP`:
 
    ```bash
-   git clone https://github.com/Self-hosted-MCP/Shared-Browser-MCP.git && cd Shared-Browser-MCP
+   git clone https://github.com/Self-hosted-MCP/Shared-Browser-MCP.git
+   ```
+
+   Then go into it:
+
+   ```bash
+   cd Shared-Browser-MCP
    ```
 
 2. Check the server. You should see `OK` lines:
@@ -166,7 +176,7 @@ The full guide with every click is [docs/setup-own-server.md](docs/setup-own-ser
    python3 scripts/hash_passphrase.py
    ```
 
-4. On the server, copy the settings and fill them in (see [settings.md](docs/settings.md)):
+4. On the server, copy the settings. You should see a new file `.env`. Open it and fill it in (see [settings.md](docs/settings.md)):
 
    ```bash
    cp .env.example .env
@@ -205,6 +215,11 @@ The full guide with every click is [docs/setup-own-server.md](docs/setup-own-ser
 | [Agents guide](AGENTS.md) | An AI agent works on the code, or sets it up for you |
 | [Getting help](SUPPORT.md) | You need help |
 | [Changelog](CHANGELOG.md) | You want to know what changed |
+| [Code of conduct](CODE_OF_CONDUCT.md) | You take part in issues or pull requests |
+| [Governance](GOVERNANCE.md) | You want to know who decides what |
+| [Contributors](CONTRIBUTORS.md) | You want to see who helped |
+| [NOTICE](NOTICE) | You want the credits and third-party licenses |
+| [Citation](CITATION.cff) | You cite the project |
 
 ## This repository
 
@@ -221,11 +236,14 @@ The full guide with every click is [docs/setup-own-server.md](docs/setup-own-ser
 
 ## Not supported yet
 
-- **A lock for your page without Cloudflare.** The page relies on Zero Trust today. See the [roadmap](docs/roadmap.md).
-- **Screenshots in this README.** This first public release was prepared without a running copy. They come with the next release.
-- **More than one person.** It is built for one owner.
-- **Tested AI apps other than Claude.** Others should work, but nobody has reported back yet.
-- **Video, GIF and PDF capture** of the shared browser.
+- **A lock for your page without Cloudflare.** The page has no login of its own and relies on Zero Trust. See the [roadmap](docs/roadmap.md).
+- **Screenshots and a demo in this README.** This first public release was prepared without a copy running on a real server.
+- **More than one person.** It is built for one owner: one passphrase, one shared browser.
+- **Tested AI apps other than Claude.** Others that support remote MCP with OAuth may work, but nobody has tested them yet.
+- **Video, GIF and PDF capture** of the shared browser. Not built yet. The AI can take still screenshots of a page instead.
+- **One-click hosting** (Railway, Render). The stack is six containers on private networks behind a Cloudflare tunnel, which these hosts don't offer.
+- **A Claude Desktop extension or Claude Code plugin.** The connector runs on your server, so you add it by its address instead. See [connect-your-ai.md](docs/connect-your-ai.md).
+- **Other languages.** The pages and docs are in English only for now.
 
 ## Help and feedback
 
@@ -239,7 +257,7 @@ The full guide with every click is [docs/setup-own-server.md](docs/setup-own-ser
 
 ## Contributors
 
-See [CONTRIBUTORS.md](CONTRIBUTORS.md). To be added, say so in your pull request, or ask in an issue.
+Thanks to everyone who sends code, bug reports, ideas or docs. See [CONTRIBUTORS.md](CONTRIBUTORS.md). To be added, say so in your pull request, or ask in an issue.
 
 ## Credits
 

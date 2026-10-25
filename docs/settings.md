@@ -69,3 +69,5 @@ The MCP server also reads these. The compose files don't pass them, so add them 
 | `work` | The browser's working folder (your uploads are mounted inside it) |
 | `downloads`, `uploads` | Files the browser downloaded, and files you dropped for the AI |
 | `ctl` | A tiny file the browser container reads: the theme |
+
+What next: [check it works](setup-own-server.md#8-check-it-works).

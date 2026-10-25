@@ -24,3 +24,5 @@ For when you want the exact limits: what Shared-Browser-MCP protects, and what i
 ## Not audited yet
 
 No outside security audit has been done. The checks are the project's own: the Self-test, `scripts/smoke-test.sh`, and GitHub's code scanning (CodeQL) once published. Reports are welcome, see [SECURITY.md](../SECURITY.md).
+
+What next: [if something goes wrong](troubleshooting.md).

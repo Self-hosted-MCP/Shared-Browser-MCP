@@ -38,6 +38,14 @@ jobs:
           echo "mcp did not answer in 5 minutes"; exit 1
       - name: Smoke test
         run: bash scripts/smoke-test.sh shared-browser
+      - name: Every health check passes
+        run: |
+          for i in $(seq 1 30); do
+            bad=$(docker ps --filter label=com.docker.compose.project=shared-browser --format '{{.Names}} {{.Status}}' | grep -v '(healthy)' | grep '(' || true)
+            [ -z "$bad" ] && { docker ps --format '{{.Names}} {{.Status}}'; exit 0; }
+            sleep 10
+          done
+          echo "Not healthy:"; echo "$bad"; exit 1
       - name: Logs on failure
         if: failure()
         run: docker compose -p shared-browser -f docker-compose.yml -f docker-compose.local.yml --env-file .env.local logs --tail 80

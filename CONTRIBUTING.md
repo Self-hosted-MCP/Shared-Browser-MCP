@@ -9,9 +9,9 @@ Click **New issue** on GitHub and pick a form:
 | Form | Use it when |
 |---|---|
 | **Something doesn't work** | You hit a bug or an error message |
-| **Question or idea** | You want to know how to do something, or have an idea |
+| **Question** | You want to know how to do something |
 | **Idea or feature** | You want something new or different |
-| **Report a security problem, privately** | Someone could misuse the project or reach private data. Only the maintainer sees it. See [SECURITY.md](SECURITY.md) |
+| **Report a security problem (private)** | Someone could misuse the project or reach private data. Only the maintainer sees it. See [SECURITY.md](SECURITY.md) |
 
 Each form asks for what's needed to help you, such as how you run it and which AI app you use.
 
@@ -41,11 +41,12 @@ Each form asks for what's needed to help you, such as how you run it and which A
 
 ## Releases (maintainers)
 
-1. Set the new version in `mcp/pyproject.toml` and `CITATION.cff`. Move the notes in [CHANGELOG.md](CHANGELOG.md) under that version, with the date.
-2. Wait for the **Tests** and **images** workflows on GitHub to pass.
-3. Tag it `vX.Y.Z` and publish a GitHub Release with the changelog notes.
-
-Every push to `main` builds the six images and publishes them as `latest`. A release tag marks the version people should use.
+1. Set the new version in `mcp/pyproject.toml`, `mcp/src/sbmcp/__init__.py` (`__version__`) and `CITATION.cff` (`version` and `date-released`). The test `tests/test_versions.py` fails if they disagree.
+2. Move the notes in [CHANGELOG.md](CHANGELOG.md) under that version, with the date.
+3. Run the tests on your computer, then wait for the **Tests** and **Stack test** workflows to pass on `main`.
+4. Tag it `vX.Y.Z` and publish a GitHub Release with the changelog notes.
+5. Publishing starts: the **images** workflow builds the six images for that release only and tags them `X.Y.Z`, `X.Y` and `latest`. Unreleased code is never published.
+6. Check the release page and the package pages on ghcr.io.
 
 ## Writing docs
 

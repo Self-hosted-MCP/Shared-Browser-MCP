@@ -18,3 +18,5 @@ For when you want to know what may come next. Nothing here is promised, and ther
 
 - More than one person per server. It is built for one owner.
 - Running without the wall around the browser.
+
+What next: [what changed so far](../CHANGELOG.md).

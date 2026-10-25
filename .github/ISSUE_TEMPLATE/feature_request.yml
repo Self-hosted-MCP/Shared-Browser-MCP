@@ -28,7 +28,6 @@ body:
         - Tools
         - Setup
         - Security or privacy
-        - Languages
         - Docs
         - Something else
   - type: textarea

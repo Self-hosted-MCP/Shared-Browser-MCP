@@ -14,6 +14,7 @@ permissions:
 jobs:
   docs:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1   # v7.0.1, pinned
         with:
@@ -25,6 +26,7 @@ jobs:
 
   mcp:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     strategy:
       matrix:
         python: ["3.11", "3.14"]
@@ -40,11 +42,14 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: uv sync --frozen
       - run: uv run python -m compileall -q src
+      - name: Safety and version tests
+        run: uv run pytest -q
       - name: Lint (errors only)
         run: uvx ruff@0.14.0 check --select E9,F63,F7,F82 src
 
   compose:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     env:
       PUBLIC_URL: https://mcp.example.com
       FRONT_URL: https://browser.example.com
@@ -66,6 +71,7 @@ jobs:
   workflows:
     name: workflows (zizmor)
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1   # v7.0.1, pinned
         with:
