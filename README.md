@@ -23,8 +23,6 @@ Runs on a server you own. Works with Claude on the website, the phone app, the d
   <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-5AC8FA" alt="Pull requests welcome"></a>
 </p>
 
-<p align="center">Free and open source under the Apache License 2.0. Use it, fork it and change it, share your changes, and keep the credit.</p>
-
 <p align="center">
   <a href="#quick-start-about-45-minutes">Quick start</a> ·
   <a href="#choose-how-to-run-it">Ways to run</a> ·
@@ -82,11 +80,11 @@ AI:   The cheapest is the 7:04 at 29 euros. I stopped before the payment page.
 - **A wall around the browser.** The browser has no direct internet. Its only way out is a filter that refuses private networks and your server's own address.
 - **Chromium's own sandbox is on.** The container has no extra permissions, a read-only filesystem, a process limit and a system call filter.
 - **Two locks on your page.** Cloudflare Zero Trust, and the app checks Cloudflare's signed token itself. Without it, everything is refused.
-- **A passphrase for AI apps.** And a new app can only connect while you press **Allow a new app**.
+- **A passphrase for AI apps.** A new app can only connect while you press **Allow a new app**.
 - **You approve actions.** Clicking, typing, scripts, uploads and deleting ask you first in your AI app.
 - **Pause in one tap.** **Pause** on your page stops the AI using the browser at once.
 - **No search history.** Searches and page text are never stored. Browser history is wiped on every start. The action log keeps the site name only, and expires.
-- **No telemetry.** Nothing is collected by this project.
+- **No telemetry.** This project collects nothing.
 
 More in [safety](docs/safety.md), [privacy](docs/privacy.md) and the [threat model](docs/threat-model.md).
 
@@ -144,9 +142,7 @@ Your AI app talks to the door. You talk to your page. Both reach the same shared
 
 ## What it isn't
 
-- Not a service. Nobody runs it for you, and nothing goes through our servers.
-- Not for teams. One owner per server.
-- Not a way past logins or "are you human" checks. Those always come to you.
+You run it yourself, and nothing goes through our servers. It has one owner per server. Logins and "are you human" checks always come to you.
 
 ## Quick start (about 45 minutes)
 
@@ -243,11 +239,11 @@ The full guide with every click is [docs/setup-own-server.md](docs/setup-own-ser
 
 ## Contributors
 
-Thank you to everyone who helps, with code, bug reports, ideas or docs. See [CONTRIBUTORS.md](CONTRIBUTORS.md). To be added, say so in your pull request, or ask in an issue.
+See [CONTRIBUTORS.md](CONTRIBUTORS.md). To be added, say so in your pull request, or ask in an issue.
 
 ## Credits
 
-Shared-Browser-MCP is made by [Self-hosted MCP](https://github.com/Self-hosted-MCP). It stands on the work of SearXNG, Chromium, Squid, Unbound, noVNC, TigerVNC, nginx, the MCP Python SDK and the HaGeZi blocklists. Their licenses are in [NOTICE](NOTICE).
+Shared-Browser-MCP is made by [Self-hosted MCP](https://github.com/Self-hosted-MCP). It is built on SearXNG, Chromium, Squid, Unbound, noVNC, TigerVNC, nginx, the MCP Python SDK and the HaGeZi blocklists. Their licenses are in [NOTICE](NOTICE).
 
 You may:
 
