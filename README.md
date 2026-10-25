@@ -2,7 +2,7 @@
 
 <h1 align="center">Shared-Browser-MCP</h1>
 
-<p align="center"><b>Private web search, a page reader and a real Chrome you can watch and take over, for your AI app.</b><br>
+<p align="center"><b>Private web search, a page reader and a shared browser you can watch and take over, for your AI app.</b><br>
 Runs on a server you own. Works with Claude on the website, the phone app, the desktop app and Claude Code, and with other MCP apps.</p>
 
 <p align="center">
@@ -43,7 +43,6 @@ Runs on a server you own. Works with Claude on the website, the phone app, the d
 - [Words you'll see](#words-youll-see)
 - [Choose how to run it](#choose-how-to-run-it)
 - [What it can do](#what-it-can-do)
-- [What it isn't](#what-it-isnt)
 - [Quick start (about 45 minutes)](#quick-start-about-45-minutes)
 - [All the guides](#all-the-guides)
 - [This repository](#this-repository)
@@ -61,9 +60,11 @@ Runs on a server you own. Works with Claude on the website, the phone app, the d
 
 ## What it is
 
-Shared-Browser-MCP is one connector that gives your AI app three things: web search with your own private search engine, a reader that turns pages and PDFs into clean text, and a real Chrome on your server. You and the AI share that Chrome. You watch it live on your own page, from your phone or your computer, and you can take over at any time.
+Shared-Browser-MCP is one connector that gives your AI app three things: web search with your own private search engine, a reader that turns pages and PDFs into clean text, and a shared browser on your server (Chromium). You and the AI use the same browser. You watch it live on your own page, from your phone or your computer, and you can take over at any time.
 
 When the AI reaches a login, a password or an "are you human" check, it stops and asks you. You do that part yourself on your page, then press **Done**. The AI never types a password.
+
+You run it yourself, on your own server, and nothing goes through ours. It has one owner per server.
 
 ```text
 You:  Find the cheapest train from Lyon to Paris next Friday morning. Don't buy anything.
@@ -81,7 +82,7 @@ AI:   The cheapest is the 7:04 at 29 euros. I stopped before the payment page.
 - **No passwords for the AI.** It can't type into password fields or read them. Logins come to you.
 - **A wall around the browser.** The browser has no direct internet. Its only way out is a filter that refuses private networks and your server's own address.
 - **Chromium's own sandbox is on.** The container has no extra permissions, a read-only filesystem, a process limit and a system call filter.
-- **Two locks on your page.** Cloudflare Zero Trust, and the app checks Cloudflare's signed token itself. Without it, everything is refused.
+- **Two locks on your page.** Cloudflare Zero Trust, and your page checks Cloudflare's signed token itself. Without it, everything is refused.
 - **A passphrase for AI apps.** A new app can only connect while you press **Allow a new app**.
 - **You approve actions.** Clicking, typing, scripts, uploads and deleting ask you first in your AI app.
 - **Pause in one tap.** **Pause** on your page stops the AI using the browser at once.
@@ -92,7 +93,7 @@ More in [safety](docs/safety.md), [privacy](docs/privacy.md) and the [threat mod
 
 ## How it works, in one picture
 
-Your AI app talks to the door. You talk to your page. Both reach the same shared Chrome, which only gets out to the internet through the wall.
+Your AI app talks to the door, and you talk to your page. Both reach the same shared browser, which only gets out to the internet through the wall.
 
 ```mermaid
 flowchart LR
@@ -100,7 +101,7 @@ flowchart LR
   You["You"] -->|"Cloudflare Zero Trust"| FRONT["your page"]
   FRONT --> MCP
   MCP --> SX["your search engine"]
-  MCP --> BR["shared Chrome"]
+  MCP --> BR["shared browser"]
   FRONT -->|"live view"| BR
   BR --> EG["the wall"] --> NET["the internet"]
 ```
@@ -114,7 +115,7 @@ Details in [docs/how-it-works.md](docs/how-it-works.md).
 | MCP | Model Context Protocol: the way AI apps use tools on other servers. |
 | The door | The address your AI app connects to (`PUBLIC_URL/mcp`), with the passphrase login. |
 | Your page | Your own page (`FRONT_URL`) with four tabs: **Browser**, **Log**, **Files** and **Settings**. |
-| Shared browser | The one Chromium you and the AI both use. |
+| Shared browser | The one browser (Chromium) you and the AI both use. |
 | Handoff | The AI asks you to take over the browser, for a login or a check. |
 | The wall | The filter (Squid) that is the browser's only way out. |
 | SearXNG | The open-source search engine that runs on your server and asks public search engines for you. |
@@ -143,10 +144,6 @@ Details in [docs/how-it-works.md](docs/how-it-works.md).
 - **The shared browser:** open pages, see buttons and fields, click, type, fill forms, wait, use tabs, look like a phone, read the console, and hand over to you.
 - **Files:** read what the browser downloaded, and attach files you dropped on your **Files** page.
 - **Checks:** `health` and the full `self_test`.
-
-## What it isn't
-
-You run it yourself, and nothing goes through our servers. It has one owner per server. Logins and "are you human" checks always come to you.
 
 ## Quick start (about 45 minutes)
 
@@ -237,7 +234,7 @@ The full guide with every click is [docs/setup-own-server.md](docs/setup-own-ser
 ## Not supported yet
 
 - **A lock for your page without Cloudflare.** The page has no login of its own and relies on Zero Trust. See the [roadmap](docs/roadmap.md).
-- **Screenshots and a demo in this README.** This first public release was prepared without a copy running on a real server.
+- **Screenshots and a demo in this README.** The public release has been tested on a fresh machine without Cloudflare, so there is no real setup to take pictures of yet.
 - **More than one person.** It is built for one owner: one passphrase, one shared browser.
 - **Tested AI apps other than Claude.** Others that support remote MCP with OAuth may work, but nobody has tested them yet.
 - **Video, GIF and PDF capture** of the shared browser. Not built yet. The AI can take still screenshots of a page instead.

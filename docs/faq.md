@@ -44,7 +44,7 @@ The pages, the messages and the guides are in English only. Your AI app can stil
 
 <details><summary><b>Does it collect anything about me?</b></summary>
 
-No. This project collects nothing. No account, no tracking. What your server sends to search engines and websites is listed in [privacy.md](privacy.md).
+No. There's no account and no tracking. What your server sends to search engines and websites is listed in [privacy.md](privacy.md).
 
 </details>
 
@@ -108,7 +108,7 @@ No. It can't type into password fields, and scripts that mention password fields
 
 <details><summary><b>Why do I need Cloudflare Zero Trust?</b></summary>
 
-Your page has no login of its own. Zero Trust is its lock, and the app checks Cloudflare's signed token itself too. A way without Cloudflare is on the [roadmap](roadmap.md).
+Your page has no login of its own. Zero Trust is its lock, and your page checks Cloudflare's signed token itself too. A way without Cloudflare is on the [roadmap](roadmap.md).
 
 </details>
 

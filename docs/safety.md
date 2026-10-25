@@ -14,12 +14,12 @@ For when you want to know what could go wrong when an AI drives a real browser, 
 
 | Risk | What it does | Guarded by |
 |---|---|---|
-| Prompt injection | Every web text comes back marked as data, not instructions. The AI's instructions say never to follow orders from a page. Actions that change something need your approval. | The tool annotations in `mcp/src/sbmcp/server.py` |
+| Prompt injection | Every web text comes back marked as page data the AI must not obey. The AI's instructions say never to follow orders from a page. Actions that change something need your approval. | The tool annotations in `mcp/src/sbmcp/server.py` |
 | Wrong actions | The five tools that change something are marked so your AI app asks you first. **Pause** on your page stops every browser tool at once. | The tool annotations in `mcp/src/sbmcp/server.py` |
 | Passwords | The AI never types into password fields and can't run scripts that read them. Logins go to you through `browser_handoff`. | `test_scripts_about_passwords_are_refused` in `mcp/tests/test_safety.py` |
 | Reaching your server | The browser sits on an internal network with no direct internet. Its only way out is the wall, which refuses private networks, the cloud metadata address and `SERVER_PUBLIC_IP`. The page reader refuses private addresses too. | `test_private_addresses_are_refused`, `test_reader_refuses_a_private_literal_address`; the wall checks in `scripts/smoke-test.sh` and the **Self-test** |
 | Breaking out of the browser | Chromium's own sandbox is on. The container drops every extra permission, has a read-only filesystem, a limit on processes, and a filter on system calls. | The sandbox check in `scripts/smoke-test.sh` and the **Self-test** |
-| Someone else | The door needs your passphrase, and new apps only while you allow it. Many wrong tries lock logins for 15 minutes. Your page needs Cloudflare Zero Trust, and the app checks Cloudflare's signed token itself. | `test_passphrase_hash_checks_the_right_passphrase_only`, `test_pairing_window_opens_for_a_limited_time`, `test_a_new_app_is_refused_while_pairing_is_closed`; the door and Zero Trust checks in the **Self-test** |
+| Someone else | The door needs your passphrase, and new apps only while you allow it. Many wrong tries lock logins for 15 minutes. Your page needs Cloudflare Zero Trust, and your page checks Cloudflare's signed token itself. | `test_passphrase_hash_checks_the_right_passphrase_only`, `test_pairing_window_opens_for_a_limited_time`, `test_a_new_app_is_refused_while_pairing_is_closed`; the door and Zero Trust checks in the **Self-test** |
 | Files | Downloads and uploads are stored and read, never run. Programs and scripts are refused. File names can't leave their folder. Files expire. | `test_programs_and_scripts_are_blocked`, `test_file_names_cannot_leave_their_folder` |
 
 ## Pick a safety level

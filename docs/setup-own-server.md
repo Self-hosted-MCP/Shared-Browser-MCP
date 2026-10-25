@@ -32,9 +32,9 @@ For when you want Shared-Browser-MCP running for real, reachable by your AI app 
 | A shell on the server (SSH) | To run the commands below. Server panels work too, see [Using a server panel such as Coolify](#using-a-server-panel-such-as-coolify). |
 
 > [!WARNING]
-> Your own page (the live browser, the log, your files and the settings) has **no login of its own**. Cloudflare Zero Trust is the lock, and the app checks Cloudflare's signed token on every request as a second lock. Never publish the page without it.
+> Your own page (the live browser, the log, your files and the settings) has **no login of its own**. Cloudflare Zero Trust is the lock, and your page checks Cloudflare's signed token on every request as a second lock. Never publish the page without it.
 
-Why a tunnel: with a Cloudflare tunnel, your server needs no open web ports. Both addresses only reach it through Cloudflare.
+With a Cloudflare tunnel, your server needs no open web ports. Both addresses only reach it through Cloudflare.
 
 ## 1. Check the server
 
@@ -144,7 +144,7 @@ With a shell on the server you can also run the longer check:
 scripts/smoke-test.sh shared-browser
 ```
 
-You should see only `PASS` lines. If a search engine fails, that is common: Google, DuckDuckGo and Wikipedia sometimes refuse server addresses. Brave usually works.
+You should see only `PASS` lines. Google, DuckDuckGo and Wikipedia sometimes refuse server addresses, so a failure from one of them is normal. Brave usually works.
 
 ## 9. Connect your AI app
 
@@ -174,7 +174,7 @@ The volumes that matter are `mcp-data` (settings, connected apps, action log) an
 
 ## What we tested
 
-- The stack this release comes from ran on an ARM server (Ubuntu, Docker Compose through a server panel) behind a Cloudflare tunnel and Zero Trust, with Claude on the website, the phone app and Claude Code, in October 2026. Its Self-test passed every check.
+- The private version this release comes from ran on an ARM server (Ubuntu, Docker Compose through a server panel) behind a Cloudflare tunnel and Zero Trust, with Claude on the website, the phone app and Claude Code, in October 2026. Its Self-test passed every check.
 - This public release (0.1.0) was built from scratch and started on a fresh Ubuntu 24.04 machine (Intel/AMD, GitHub Actions) on 25 October 2026, without Cloudflare (`ACCESS_ENFORCE=0`). All 16 checks in `scripts/smoke-test.sh` passed, and the images were built for Intel/AMD and ARM.
 - Not tested with this release: a full server setup behind Cloudflare, other AI apps than Claude.
 

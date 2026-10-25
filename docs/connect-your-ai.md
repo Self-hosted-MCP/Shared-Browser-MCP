@@ -41,37 +41,9 @@ Then type `/mcp` in Claude Code and pick `shared-browser` to log in. Claude Code
 
 Tested in October 2026.
 
-## ChatGPT
+## Not tested yet
 
-Not tested yet. If ChatGPT supports remote MCP servers over HTTP with OAuth, add `https://mcp.example.com/mcp` as a remote server in its MCP settings, then follow [the steps for other apps](#other-mcp-apps). Please tell us in an issue if it works.
-
-## Codex
-
-Not tested yet. If Codex supports remote MCP servers over HTTP with OAuth, add `https://mcp.example.com/mcp` as a remote server in its MCP settings, then follow [the steps for other apps](#other-mcp-apps). Please tell us in an issue if it works.
-
-## Cursor
-
-Not tested yet. If Cursor supports remote MCP servers over HTTP with OAuth, add `https://mcp.example.com/mcp` as a remote server in its MCP settings, then follow [the steps for other apps](#other-mcp-apps). Please tell us in an issue if it works.
-
-## VS Code
-
-Not tested yet. If VS Code supports remote MCP servers over HTTP with OAuth, add `https://mcp.example.com/mcp` as a remote server in its MCP settings, then follow [the steps for other apps](#other-mcp-apps). Please tell us in an issue if it works.
-
-## Gemini CLI
-
-Not tested yet. If Gemini CLI supports remote MCP servers over HTTP with OAuth, add `https://mcp.example.com/mcp` as a remote server in its MCP settings, then follow [the steps for other apps](#other-mcp-apps). Please tell us in an issue if it works.
-
-## OpenClaw
-
-Not tested yet. If OpenClaw supports remote MCP servers over HTTP with OAuth, add `https://mcp.example.com/mcp` as a remote server in its MCP settings, then follow [the steps for other apps](#other-mcp-apps). Please tell us in an issue if it works.
-
-## Hermes Agent
-
-Not tested yet. If Hermes Agent supports remote MCP servers over HTTP with OAuth, add `https://mcp.example.com/mcp` as a remote server in its MCP settings, then follow [the steps for other apps](#other-mcp-apps). Please tell us in an issue if it works.
-
-## Goose
-
-Not tested yet. If Goose supports remote MCP servers over HTTP with OAuth, add `https://mcp.example.com/mcp` as a remote server in its MCP settings, then follow [the steps for other apps](#other-mcp-apps). Please tell us in an issue if it works.
+Nobody has tested these apps yet: ChatGPT, Codex, Cursor, VS Code, Gemini CLI, OpenClaw, Hermes Agent and Goose. If one supports remote MCP servers over HTTP with OAuth, add `https://mcp.example.com/mcp` as a remote server in its MCP settings, then follow [the steps for other apps](#other-mcp-apps). Please tell us in an issue if it works.
 
 ## Other MCP apps
 
