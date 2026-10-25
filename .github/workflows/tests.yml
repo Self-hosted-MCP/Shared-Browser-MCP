@@ -1,0 +1,74 @@
+# Runs on each push and pull request. Uses test data only: no real account, password or network service is touched.
+# docs: every link works, every tool and setting is documented, no em dashes.
+# mcp: the Python server installs from its lock file and passes the lint.
+# compose: every compose file is valid. scripts: every shell script parses.
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1   # v7.0.1, pinned
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884  # v10.3.0, pinned
+        with:
+          python-version: "3.14"
+      - run: uvx --from pytest==8.4.2 pytest -q tests
+
+  mcp:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.11", "3.14"]
+    defaults:
+      run:
+        working-directory: mcp
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1   # v7.0.1, pinned
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884  # v10.3.0, pinned
+        with:
+          python-version: ${{ matrix.python }}
+      - run: uv sync --frozen
+      - run: uv run python -m compileall -q src
+      - name: Lint (errors only)
+        run: uvx ruff@0.14.0 check --select E9,F63,F7,F82 src
+
+  compose:
+    runs-on: ubuntu-latest
+    env:
+      PUBLIC_URL: https://mcp.example.com
+      FRONT_URL: https://browser.example.com
+      LOGIN_HASH: pbkdf2:600000:00:00
+      SEARXNG_SECRET: test-only
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1   # v7.0.1, pinned
+        with:
+          persist-credentials: false
+      - run: docker compose -f docker-compose.yml config -q
+      - run: docker compose -f docker-compose.yml -f docker-compose.local.yml config -q
+      - run: docker compose -f docker-compose.server.yml config -q
+      - run: docker compose -f docker-compose.server.yml -f docker-compose.hostports.yml config -q
+      - name: Shell scripts are valid
+        run: |
+          for f in scripts/preflight.sh scripts/smoke-test.sh browser/start.sh; do bash -n "$f"; done
+          for f in browser/show-desktop.sh dns/run.sh egress/start.sh; do sh -n "$f"; done
+
+  workflows:
+    name: workflows (zizmor)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1   # v7.0.1, pinned
+        with:
+          persist-credentials: false
+      # Unsafe patterns in GitHub Actions: leaked tokens, injection, broad permissions.
+      - run: pipx run zizmor==1.31.1 --offline .

@@ -1,0 +1,7 @@
+# Fallback if your server panel (for example Coolify) cannot route the two services by domain: publish them on the server's own loopback and point the
+# Cloudflare tunnel straight at them (your page -> http://localhost:8081, the AI door -> http://localhost:8765).
+services:
+  front:
+    ports: ["127.0.0.1:8081:80"]
+  mcp:
+    ports: ["127.0.0.1:8765:8765"]

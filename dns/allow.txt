@@ -1,0 +1,2 @@
+# Domains that must work even though the blocklist blocks them (one per line, subdomains included).
+# Add a line, push, build, deploy. Example: example-tracker.com

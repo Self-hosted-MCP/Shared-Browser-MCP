@@ -1,0 +1,112 @@
+{
+  "DownloadDirectory": "/files/downloads",
+  "PromptForDownloadLocation": false,
+  "DefaultDownloadDirectory": "/files/downloads",
+  "URLBlocklist": [
+    "chrome://flags*",
+    "chrome://inspect*",
+    "chrome://settings/syncSetup*",
+    "devtools://*",
+    "file://*",
+    "http://0.0.0.0*",
+    "http://127.*",
+    "http://[::1]*",
+    "http://localhost*",
+    "https://127.*",
+    "https://[::1]*",
+    "https://localhost*"
+  ],
+  "PasswordManagerEnabled": false,
+  "AutofillCreditCardEnabled": false,
+  "AutofillAddressEnabled": false,
+  "BrowserSignin": 0,
+  "SyncDisabled": true,
+  "MetricsReportingEnabled": false,
+  "TranslateEnabled": false,
+  "AlwaysOpenPdfExternally": true,
+  "NewTabPageLocation": "http://front:8088/",
+  "HomepageLocation": "http://front:8088/",
+  "HomepageIsNewTabPage": false,
+  "ShowHomeButton": true,
+  "RestoreOnStartup": 4,
+  "RestoreOnStartupURLs": [
+    "http://front:8088/"
+  ],
+  "SearchSuggestEnabled": false,
+  "SpellcheckEnabled": false,
+  "UrlKeyedAnonymizedDataCollectionEnabled": false,
+  "NetworkPredictionOptions": 2,
+  "BackgroundModeEnabled": false,
+  "PrivacySandboxPromptEnabled": false,
+  "PrivacySandboxAdMeasurementEnabled": false,
+  "PrivacySandboxAdTopicsEnabled": false,
+  "PrivacySandboxSiteEnabledAdsEnabled": false,
+  "ChromeVariations": 2,
+  "SafeBrowsingProtectionLevel": 1,
+  "DefaultSearchProviderEnabled": true,
+  "DefaultSearchProviderName": "SearXNG",
+  "DefaultSearchProviderKeyword": "s",
+  "DefaultSearchProviderSearchURL": "http://front:8088/search?q={searchTerms}",
+  "DefaultSearchProviderSuggestURL": "",
+  "ExtensionInstallBlocklist": [
+    "*"
+  ],
+  "DefaultGeolocationSetting": 2,
+  "DefaultNotificationsSetting": 2,
+  "DefaultSensorsSetting": 2,
+  "DefaultWebBluetoothGuardSetting": 2,
+  "DefaultWebUsbGuardSetting": 2,
+  "DefaultSerialGuardSetting": 2,
+  "VideoCaptureAllowed": false,
+  "AudioCaptureAllowed": false,
+  "ScreenCaptureAllowed": false,
+  "WebRtcIPHandlingPolicy": "disable_non_proxied_udp",
+  "ExtensionInstallAllowlist": [
+    "ddkjiahejlhfcafbddmgiahcphecmpfh"
+  ],
+  "ExtensionInstallForcelist": [
+    "ddkjiahejlhfcafbddmgiahcphecmpfh;https://clients2.google.com/service/update2/crx"
+  ],
+  "BlockExternalExtensions": true,
+  "3rdparty": {
+    "extensions": {
+      "ddkjiahejlhfcafbddmgiahcphecmpfh": {
+        "defaultFiltering": "complete",
+        "rulesets": [
+          "-*",
+          "+default",
+          "+adguard-spyware-url",
+          "+annoyances-cookies",
+          "+annoyances-overlays",
+          "+annoyances-notifications"
+        ],
+        "disableFirstRunPage": true,
+        "showBlockedCount": true,
+        "popupBlockMode": true,
+        "strictBlockMode": true
+      }
+    }
+  },
+  "HttpsUpgradesEnabled": true,
+  "BuiltInDnsClientEnabled": false,
+  "DnsOverHttpsMode": "off",
+  "QuicAllowed": false,
+  "SSLVersionMin": "tls1.2",
+  "SitePerProcess": true,
+  "DefaultLocalFontsSetting": 2,
+  "DefaultWebHidGuardSetting": 2,
+  "DefaultInsecureContentSetting": 2,
+  "DownloadRestrictions": 1,
+  "PaymentMethodQueryEnabled": false,
+  "PasswordLeakDetectionEnabled": false,
+  "SafeBrowsingExtendedReportingEnabled": false,
+  "BrowserNetworkTimeQueriesEnabled": false,
+  "RelatedWebsiteSetsEnabled": false,
+  "EnableMediaRouter": false,
+  "ShoppingListEnabled": false,
+  "PromotionalTabsEnabled": false,
+  "DefaultBrowserSettingEnabled": false,
+  "BrowserLabsEnabled": false,
+  "GenAiDefaultSettings": 2,
+  "CloudReportingEnabled": false
+}

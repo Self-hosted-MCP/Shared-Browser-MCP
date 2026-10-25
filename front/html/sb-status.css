@@ -1,0 +1,135 @@
+/* Search page: SearXNG's own colours are variables, so this swaps them for the same blue-neutral palette as the main page,
+   then softens the shapes. Also replaces SearXNG's footer with a few lines about this connection. */
+footer { display: none !important; }
+
+:root.theme-auto, :root.theme-light {
+  --sb-accent: oklch(0.54 0.18 255);
+  --sb-line: oklch(0.9 0.008 250);
+  --color-base-font: oklch(0.32 0.014 255);
+  --color-base-background: oklch(0.972 0.005 250);
+  --color-base-background-mobile: oklch(0.972 0.005 250);
+  --color-header-background: oklch(0.972 0.005 250);
+  --color-header-border: var(--sb-line);
+  --color-footer-background: transparent;
+  --color-footer-border: var(--sb-line);
+  --color-sidebar-background: oklch(0.995 0.002 250);
+  --color-sidebar-border: var(--sb-line);
+  --color-search-background: oklch(0.995 0.002 250);
+  --color-search-border: var(--sb-line);
+  --color-search-font: oklch(0.2 0.014 255);
+  --color-search-shadow: 0 1px 0 oklch(1 0 0 / .8) inset, 0 1px 2px oklch(0.25 0.03 255 / .07), 0 6px 20px oklch(0.25 0.03 255 / .07);
+  --color-search-background-hover: var(--sb-accent);
+  --color-btn-background: var(--sb-accent);
+  --color-categories-item-selected-font: var(--sb-accent);
+  --color-categories-item-border-selected: var(--sb-accent);
+  --color-autocomplete-background: oklch(0.995 0.002 250);
+  --color-autocomplete-border: var(--sb-line);
+  --color-autocomplete-shadow: 0 2px 4px oklch(0.2 0.03 255 / .08), 0 14px 40px oklch(0.2 0.03 255 / .16);
+  --color-answer-background: oklch(0.995 0.002 250);
+  --color-result-background: oklch(0.995 0.002 250);
+  --color-result-border: var(--sb-line);
+  --color-url-font: oklch(0.45 0.1 255);
+  --color-result-url-font: oklch(0.42 0.02 255);
+  --color-result-link-font: oklch(0.45 0.16 255);
+  --color-result-link-font-highlight: oklch(0.45 0.16 255);
+  --color-result-engines-font: oklch(0.55 0.016 255);
+  --color-result-publishdate-font: oklch(0.55 0.016 255);
+}
+@media (prefers-color-scheme: dark) {
+  :root.theme-auto {
+    --sb-accent: oklch(0.72 0.15 255);
+    --sb-line: oklch(0.28 0.012 255);
+    --color-base-font: oklch(0.78 0.012 255);
+    --color-base-background: oklch(0.165 0.01 255);
+    --color-base-background-mobile: oklch(0.165 0.01 255);
+    --color-header-background: oklch(0.165 0.01 255);
+    --color-header-border: var(--sb-line);
+    --color-footer-background: transparent;
+    --color-footer-border: var(--sb-line);
+    --color-sidebar-background: oklch(0.2 0.012 255);
+    --color-sidebar-border: var(--sb-line);
+    --color-search-background: oklch(0.22 0.012 255);
+    --color-search-border: var(--sb-line);
+    --color-search-font: oklch(0.955 0.005 250);
+    --color-search-shadow: 0 1px 0 oklch(1 0 0 / .05) inset, 0 1px 2px oklch(0 0 0 / .35), 0 8px 24px oklch(0 0 0 / .3);
+    --color-search-background-hover: var(--sb-accent);
+    --color-btn-background: var(--sb-accent);
+    --color-categories-item-selected-font: var(--sb-accent);
+    --color-categories-item-border-selected: var(--sb-accent);
+    --color-autocomplete-background: oklch(0.22 0.012 255);
+    --color-autocomplete-border: var(--sb-line);
+    --color-autocomplete-shadow: 0 2px 4px oklch(0 0 0 / .4), 0 18px 48px oklch(0 0 0 / .6);
+    --color-answer-background: oklch(0.2 0.012 255);
+    --color-result-background: oklch(0.2 0.012 255);
+    --color-result-border: var(--sb-line);
+    --color-url-font: oklch(0.78 0.1 255);
+    --color-result-url-font: oklch(0.72 0.014 255);
+    --color-result-link-font: oklch(0.78 0.12 255);
+    --color-result-link-font-highlight: oklch(0.78 0.12 255);
+    --color-result-engines-font: oklch(0.65 0.014 255);
+    --color-result-publishdate-font: oklch(0.65 0.014 255);
+  }
+}
+
+:root { accent-color: var(--sb-accent, #3b6fd4); scrollbar-color: var(--sb-line, #ccc) transparent; }
+body { -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums; }
+::selection { background: color-mix(in oklch, var(--sb-accent, #3b6fd4) 28%, transparent); }
+:focus-visible { outline: 2px solid var(--sb-accent, #3b6fd4); outline-offset: 2px; }
+
+/* the search box: a soft pill that lifts a little */
+.search_box { border-radius: 999px; overflow: hidden; background: var(--color-search-background); border: 1px solid var(--color-search-border); box-shadow: var(--color-search-shadow); transition: box-shadow .2s, border-color .2s; }
+.search_box:focus-within { border-color: var(--sb-accent); box-shadow: var(--color-search-shadow), 0 0 0 3px color-mix(in oklch, var(--sb-accent) 22%, transparent); }
+.search_box #q { background: transparent; border: 0; border-radius: 0; box-shadow: none; font-size: 1.05rem; padding-left: 1.1rem; }
+.search_box button { background: transparent; }
+
+/* category tabs: quiet until selected, tighter icons */
+.search_categories { gap: .15rem; }
+#categories_container .category, .search_categories .category { border-radius: 8px; font-size: .9rem; color: color-mix(in oklch, var(--color-base-font) 72%, transparent); transition: background .12s, color .12s; }
+.search_categories .category:hover { color: var(--color-base-font); background: color-mix(in oklch, var(--color-base-font) 7%, transparent); }
+.search_categories .category.selected, .search_categories .category.selected:hover { color: var(--sb-accent); background: transparent; }
+.search_categories .category svg { width: 1.15rem; height: 1.15rem; }
+
+/* filters: three small pills in a row. The open list is drawn by the system and follows light or dark. */
+.search_filters { display: flex; flex-wrap: wrap; gap: .5rem; padding: .6rem 0 .4rem; align-items: center; }
+.search_filters select {
+  appearance: none; -webkit-appearance: none; width: auto; max-width: 14rem; height: 2rem; margin: 0;
+  padding: 0 1.9rem 0 .85rem; font: inherit; font-size: .88rem; color: var(--color-base-font);
+  background: var(--color-search-background) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") right .65rem center / .7rem no-repeat;
+  border: 1px solid var(--sb-line); border-radius: 999px; cursor: pointer; transition: border-color .12s, background-color .12s;
+}
+.search_filters select:hover { border-color: color-mix(in oklch, var(--sb-line), var(--color-base-font) 30%); }
+.search_filters select:focus, .search_filters select:focus-visible { outline: none; border-color: var(--sb-accent); box-shadow: 0 0 0 3px color-mix(in oklch, var(--sb-accent) 22%, transparent); }
+.search_filters select option { background: var(--color-sidebar-background); color: var(--color-base-font); }
+.search_filters > div, .search_filters .select-wrap { background: none; border: 0; box-shadow: none; }
+
+/* results: address small and quiet, title the clear first read, a calm snippet, engines tucked under it */
+.result { border-radius: 14px; border: 1px solid transparent !important; padding: .9rem 1.1rem .8rem !important; margin: .15rem 0; transition: background .15s, border-color .15s; }
+.result:hover { background: var(--color-result-background); border-color: var(--color-result-border) !important; }
+.result .url_wrapper { font-size: .8rem; color: var(--color-result-url-font); opacity: .8; }
+.result .url_o1, .result .url_i1 { font-size: inherit; }
+.result h3 { margin: .15rem 0 .35rem; font-size: 1.12rem; line-height: 1.3; font-weight: 500; letter-spacing: -.005em; }
+.result h3 a { text-decoration: none; }
+.result h3 a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.result .content { font-size: .92rem; line-height: 1.58; max-width: 68ch; color: color-mix(in oklch, var(--color-base-font) 82%, transparent); }
+.result .highlight { color: var(--color-search-font); font-weight: 600; }
+.result h3 .highlight { color: inherit; font-weight: inherit; }
+.result .published_date { font-size: .78rem; color: var(--color-result-publishdate-font); margin-right: .4rem; }
+.result .engines { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: .1rem .7rem; margin-top: .45rem; font-size: .78rem; opacity: .7; transition: opacity .15s; }
+.result:hover .engines { opacity: 1; }
+.result .engines > svg { display: none; }
+.result .engines a.cache_link { margin-left: auto; }
+.result img.thumbnail, .result .image_thumbnail { border-radius: 8px; }
+#answers, .answer, .infobox, #sidebar .infobox { border-radius: 14px; }
+.infobox, #answers { border: 1px solid var(--color-result-border); box-shadow: 0 1px 2px oklch(0 0 0 / .05); }
+#pagination .btn, #pagination button, .btn-default, input[type=submit] { border-radius: 9px; }
+
+/* the lines about this connection, where the footer was */
+#sb-status { display: flex; flex-wrap: wrap; justify-content: center; gap: .9rem 2.2rem; padding: 1.8rem 1rem 2.2rem; margin-top: 1.5rem; border-top: 1px solid var(--sb-line, #ddd); font-size: .82rem; line-height: 1.35; text-align: center; font-variant-numeric: tabular-nums; }
+#sb-status .sb-item { display: flex; flex-direction: column; gap: .15rem; }
+#sb-status .sb-label { opacity: .65; }
+#sb-status b { font-weight: 600; }
+
+/* phone: the "Show more" button under the first 10 results */
+#sb-more { display: block; width: 100%; margin: .8rem 0; padding: .8rem 1rem; border-radius: 14px; border: 1px solid var(--sb-line); background: var(--color-result-background); color: var(--color-result-link-font); font: inherit; font-weight: 500; cursor: pointer; }
+.result[hidden] { display: none !important; }
+

@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14161a" media="(prefers-color-scheme: dark)">
+<title>Shared Browser</title>
+<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<style>
+  /* Restrained blue-tinted neutrals, one accent. Depth comes from soft layered shadows and a faint top light, not from decoration. */
+  :root {
+    color-scheme: light dark;
+    --bg: oklch(0.972 0.005 250);
+    --bg2: oklch(0.955 0.008 250);
+    --surface: oklch(0.995 0.002 250);
+    --stage: oklch(0.93 0.006 250);
+    --fg: oklch(0.2 0.014 255);
+    --mut: oklch(0.5 0.016 255);
+    --line: oklch(0.9 0.008 250);
+    --hover: oklch(0.95 0.008 250);
+    --accent: oklch(0.54 0.18 255);
+    --accent-soft: color-mix(in oklch, var(--accent) 11%, transparent);
+    --on-accent: oklch(0.99 0 0);
+    --ok: oklch(0.64 0.16 150);
+    --warn: oklch(0.72 0.15 75);
+    --bad: oklch(0.58 0.2 25);
+    --lift: 0 1px 0 oklch(1 0 0 / .8) inset, 0 1px 2px oklch(0.25 0.03 255 / .06), 0 4px 14px oklch(0.25 0.03 255 / .05);
+    --pop: 0 2px 4px oklch(0.2 0.03 255 / .08), 0 14px 40px oklch(0.2 0.03 255 / .18);
+    --r: 14px;
+    --bar: 52px;
+    --ease: cubic-bezier(.2, .8, .2, 1);
+    accent-color: var(--accent);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: oklch(0.165 0.01 255);
+      --bg2: oklch(0.145 0.01 255);
+      --surface: oklch(0.2 0.012 255);
+      --stage: oklch(0.12 0.006 250);
+      --fg: oklch(0.955 0.005 250);
+      --mut: oklch(0.7 0.014 255);
+      --line: oklch(0.28 0.012 255);
+      --hover: oklch(0.25 0.012 255);
+      --accent: oklch(0.72 0.15 255);
+      --accent-soft: color-mix(in oklch, var(--accent) 16%, transparent);
+      --on-accent: oklch(0.15 0.01 255);
+      --lift: 0 1px 0 oklch(1 0 0 / .05) inset, 0 1px 2px oklch(0 0 0 / .35), 0 6px 18px oklch(0 0 0 / .25);
+      --pop: 0 2px 4px oklch(0 0 0 / .4), 0 18px 48px oklch(0 0 0 / .6);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg); color: var(--fg); caret-color: var(--accent);
+    font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI Variable Text", "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums;
+    display: flex; flex-direction: column; height: 100dvh; overflow: hidden;
+  }
+  ::selection { background: color-mix(in oklch, var(--accent) 28%, transparent); }
+  button, select { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  [hidden] { display: none !important; }
+
+  /* top bar */
+  header {
+    height: calc(var(--bar) + env(safe-area-inset-top)); padding: env(safe-area-inset-top) max(10px, env(safe-area-inset-left)) 0;
+    display: flex; align-items: center; justify-content: space-between; flex: none;
+    background: var(--bg); border-bottom: 1px solid var(--line); position: relative; z-index: 2;
+  }
+  .ghost { display: inline-flex; align-items: center; gap: 8px; height: 38px; border: 0; border-radius: 10px; background: none; cursor: pointer; transition: background .15s, transform .1s; }
+  .ghost:hover, .ghost[aria-expanded="true"] { background: var(--hover); }
+  .ghost:active { transform: scale(.96); }
+  #menu-btn { width: 38px; justify-content: center; }
+  .lhs { display: flex; align-items: center; gap: 2px; }
+  #kbd-btn { display: none; width: 40px; justify-content: center; }
+  @media (pointer: coarse) { body[data-view="browser"] #kbd-btn { display: inline-flex; } }
+  #status-btn { padding: 0 14px 0 12px; font-size: 13px; font-weight: 500; color: var(--mut); background: var(--surface); box-shadow: var(--lift); border: 1px solid var(--line); border-radius: 999px; height: 32px; }
+  #status-btn:hover { background: var(--surface); color: var(--fg); }
+  @media (max-width: 420px) { #state-top { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); } #status-btn { padding: 0 11px; } }
+
+  /* menu */
+  #menu {
+    position: fixed; inset: auto; margin: 0; top: calc(var(--bar) + env(safe-area-inset-top) - 4px); left: max(10px, env(safe-area-inset-left));
+    width: min(268px, calc(100vw - 20px)); padding: 6px; background: var(--surface); color: var(--fg);
+    border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--pop);
+    transform-origin: top left; opacity: 0; transform: scale(.96) translateY(-6px);
+    transition: opacity .16s var(--ease), transform .18s var(--ease), overlay .18s allow-discrete, display .18s allow-discrete;
+  }
+  #menu:popover-open { opacity: 1; transform: none; }
+  @starting-style { #menu:popover-open { opacity: 0; transform: scale(.96) translateY(-6px); } }
+  .item { width: 100%; display: flex; align-items: center; gap: 12px; padding: 8px 10px; border: 0; border-radius: 10px; background: none; text-align: left; cursor: pointer; transition: background .12s; font-weight: 500; }
+  .item svg { width: 32px; height: 32px; padding: 6px; border-radius: 9px; background: var(--hover); color: var(--mut); transition: background .15s, color .15s; }
+  .item:hover { background: var(--hover); }
+  .item[aria-current="page"] { background: var(--accent-soft); color: var(--accent); }
+  .item[aria-current="page"] svg { background: var(--accent); color: var(--on-accent); }
+  .menu-foot { margin: 6px 4px 2px; padding-top: 8px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .menu-foot > span { color: var(--mut); font-size: 13px; padding-left: 6px; }
+
+  /* handoff */
+  #handoff { display: flex; gap: 12px; align-items: center; padding: 10px max(16px, env(safe-area-inset-left)); flex: none; color: var(--on-accent);
+             background: linear-gradient(180deg, color-mix(in oklch, var(--accent) 92%, white), var(--accent)); animation: drop .24s var(--ease); }
+  #handoff p { margin: 0; flex: 1; font-weight: 500; }
+  #handoff button { border: 0; border-radius: 9px; padding: 7px 16px; background: var(--on-accent); color: var(--accent); font-weight: 600; cursor: pointer; transition: transform .1s; }
+  #handoff button:active { transform: scale(.96); }
+  @keyframes drop { from { opacity: 0; transform: translateY(-8px); } }
+
+  /* views */
+  main { flex: 1; min-height: 0; position: relative; background: var(--stage); }
+  #f-browser { position: absolute; border: 0; background: var(--stage); }
+  .page { position: absolute; inset: 0; overflow: auto; scrollbar-width: thin; scrollbar-color: var(--line) transparent;
+          background: radial-gradient(120% 60% at 50% 0, var(--bg) 0, var(--bg2) 100%) fixed;
+          padding: 32px max(16px, env(safe-area-inset-left)) calc(40px + env(safe-area-inset-bottom)); }
+  .wrap { max-width: 580px; margin: 0 auto; animation: rise .32s var(--ease) both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } }
+  h1 { font-size: 26px; line-height: 1.15; letter-spacing: -0.02em; font-weight: 700; margin: 0 0 24px 2px; text-wrap: balance; }
+  h2 { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--mut); margin: 30px 0 10px 16px; }
+  h1 + h2, h1 + .group { margin-top: 0; }
+
+  /* grouped rows */
+  .group { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--lift); overflow: hidden; }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 16px; min-height: 56px; }
+  .row + .row, .group > * + .row { border-top: 1px solid var(--line); }
+  .row > :first-child { min-width: 0; font-weight: 500; }
+  .sub { display: block; color: var(--mut); font-size: 13px; font-weight: 400; margin-top: 2px; overflow-wrap: anywhere; }
+  .foot { margin: 10px 16px 0; color: var(--mut); font-size: 13px; }
+  #apps-list .row, #st-results .check:first-child { border-top: 1px solid var(--line); }
+  .tools { display: flex; align-items: center; gap: 8px; flex: none; }
+  .btn { border: 1px solid var(--line); background: var(--surface); border-radius: 9px; padding: 6px 14px; cursor: pointer; white-space: nowrap; text-decoration: none; font-weight: 500; font-size: 14px;
+         box-shadow: 0 1px 2px oklch(0.25 0.03 255 / .06); transition: background .12s, border-color .12s, transform .1s; }
+  .btn:hover { background: var(--hover); border-color: color-mix(in oklch, var(--line), var(--mut) 25%); }
+  .btn:active { transform: scale(.97); }
+  .btn:disabled { opacity: .45; cursor: default; transform: none; }
+  .btn.armed { background: var(--bad); border-color: transparent; color: oklch(0.99 0 0); }
+  .btn.primary { background: var(--accent); border-color: transparent; color: var(--on-accent); font-weight: 600; }
+  .btn.primary:hover { background: color-mix(in oklch, var(--accent) 90%, black); }
+  select.btn { appearance: none; padding-right: 30px; background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") right 10px center / 12px no-repeat; }
+
+  .seg { display: inline-flex; padding: 3px; gap: 2px; background: var(--hover); border-radius: 11px; box-shadow: inset 0 1px 2px oklch(0.2 0.03 255 / .07); }
+  .seg button { border: 0; background: none; padding: 5px 14px; border-radius: 8px; cursor: pointer; color: var(--mut); font-weight: 500; font-size: 14px; transition: background .15s, color .15s, box-shadow .15s; }
+  .seg button:hover { color: var(--fg); }
+  .seg button[aria-checked="true"] { background: var(--surface); color: var(--fg); font-weight: 600; box-shadow: 0 1px 3px oklch(0.2 0.03 255 / .18), 0 0 0 .5px var(--line); }
+
+  .switch { position: relative; width: 48px; height: 29px; border: 0; border-radius: 15px; background: color-mix(in oklch, var(--mut) 30%, var(--line)); cursor: pointer; transition: background .2s; flex: none; box-shadow: inset 0 1px 2px oklch(0 0 0 / .12); }
+  .switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 25px; height: 25px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px oklch(0 0 0 / .3), 0 0 0 .5px oklch(0 0 0 / .06); transition: transform .22s var(--ease); }
+  .switch[aria-checked="true"] { background: var(--ok); }
+  .switch[aria-checked="true"]::after { transform: translateX(19px); }
+
+  .pill { display: inline-flex; align-items: center; gap: 10px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ok); opacity: .55; flex: none; transition: opacity .2s, background .2s; }
+  .dot.on { opacity: 1; animation: pulse 1.4s ease-out infinite; }
+  .dot.paused { background: var(--warn); opacity: 1; }
+  .dot.fail { background: var(--bad); opacity: 1; }
+  .dot.pass { opacity: 1; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--ok) 55%, transparent); } 100% { box-shadow: 0 0 0 8px transparent; } }
+  .check { display: flex; gap: 12px; align-items: flex-start; padding: 11px 16px; border-top: 1px solid var(--line); font-size: 14px; font-weight: 500; }
+  .check .dot { margin-top: 7px; }
+
+  /* log and files */
+  .day { margin: 26px 0 10px 16px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--mut); }
+  .day:first-child { margin-top: 0; }
+  .entry { display: flex; gap: 16px; padding: 11px 16px; content-visibility: auto; contain-intrinsic-size: auto 42px; transition: background .12s; }
+  .entry:hover { background: var(--hover); }
+  .entry + .entry { border-top: 1px solid var(--line); }
+  .entry time { color: var(--mut); font-size: 13px; padding-top: 1px; }
+  .file { display: flex; align-items: center; gap: 12px; padding: 12px 16px; content-visibility: auto; contain-intrinsic-size: auto 60px; }
+  .file + .file { border-top: 1px solid var(--line); }
+  .file .nm { flex: 1; min-width: 0; overflow-wrap: anywhere; font-weight: 500; }
+  .drop { display: grid; place-items: center; gap: 4px; text-align: center; padding: 32px 18px; border: 1.5px dashed color-mix(in oklch, var(--line), var(--mut) 30%); border-radius: var(--r); background: var(--surface); cursor: pointer; transition: border-color .15s, background .15s, transform .15s; }
+  .drop:hover, .drop.over { border-color: var(--accent); background: color-mix(in oklch, var(--accent) 6%, var(--surface)); }
+  .drop.over { transform: scale(1.01); }
+  .drop b { font-weight: 600; }
+  .drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+  .empty { padding: 30px 18px; text-align: center; color: var(--mut); }
+  .empty b { display: block; color: var(--fg); margin-bottom: 2px; font-weight: 600; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition-duration: .01ms !important; animation-duration: .01ms !important; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-browser" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2.5"/><path d="M3 9.5h18"/></symbol>
+  <symbol id="i-log" viewBox="0 0 24 24"><path d="M8 6.5h12M8 12h12M8 17.5h12"/><path d="M4 6.5h.01M4 12h.01M4 17.5h.01"/></symbol>
+  <symbol id="i-files" viewBox="0 0 24 24"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-kbd" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M6.5 10h.01M10 10h.01M14 10h.01M17.5 10h.01M7.5 14h9"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol>
+</svg>
+
+<header>
+  <div class="lhs"><button class="ghost" id="menu-btn" aria-label="Menu" aria-haspopup="menu" aria-expanded="false" aria-controls="menu" popovertarget="menu"><svg><use href="#i-menu"/></svg></button><button class="ghost" id="kbd-btn" aria-label="Show keyboard" title="Show keyboard"><svg><use href="#i-kbd"/></svg></button></div>
+  <button class="ghost" id="status-btn" aria-label="Claude status. Open settings" title="Claude status"><i class="dot" id="dot-top"></i><span id="state-top">Idle</span></button>
+</header>
+
+<nav id="menu" popover aria-label="Main">
+  <button class="item" data-go="browser"><svg><use href="#i-browser"/></svg>Browser</button>
+  <button class="item" data-go="log"><svg><use href="#i-log"/></svg>Log</button>
+  <button class="item" data-go="files"><svg><use href="#i-files"/></svg>Files</button>
+  <button class="item" data-go="settings"><svg><use href="#i-settings"/></svg>Settings</button>
+  <button class="item" id="menu-pause"><svg><use href="#i-pause"/></svg><span id="menu-pause-text">Pause Claude</span></button>
+  <div class="menu-foot"><span>View</span><div class="seg" role="radiogroup" aria-label="View" id="seg-menu"><button role="radio" data-mode="desktop">Desktop</button><button role="radio" data-mode="phone">Phone</button></div></div>
+</nav>
+
+<div id="handoff" role="alert" hidden><p id="handoff-text"></p><button id="handoff-done">Done</button></div>
+
+<main>
+  <iframe id="f-browser" title="Live browser" allow="clipboard-read; clipboard-write"></iframe>
+
+  <section id="log" class="page" hidden aria-labelledby="log-h">
+    <div class="wrap"><h1 id="log-h">Log</h1><div id="log-list"></div></div>
+  </section>
+
+  <section id="files" class="page" hidden aria-labelledby="files-h">
+    <div class="wrap">
+      <h1 id="files-h">Files</h1>
+      <h2>Downloads</h2>
+      <div id="dl-list"></div>
+      <p class="foot" id="files-note"></p>
+      <h2>Uploads for Claude</h2>
+      <label class="drop" id="drop"><b>Drop files here, or tap to choose</b><span class="sub">Claude can then attach them on a website, with your approval.</span><input type="file" id="up-input" multiple></label>
+      <p class="foot" id="up-msg" aria-live="polite"></p>
+      <div id="up-list"></div>
+    </div>
+  </section>
+
+  <section id="settings" class="page" hidden aria-labelledby="set-h">
+    <div class="wrap">
+      <h1 id="set-h">Settings</h1>
+
+      <h2>Claude</h2>
+      <div class="group">
+        <div class="row"><span class="pill"><i class="dot" id="dot"></i><span id="state">Idle</span></span><button class="btn" id="pause">Pause</button></div>
+        <div class="row"><span>New apps<span class="sub" id="pair-msg" aria-live="polite">A new app can only connect while this is open.</span></span><button class="btn" id="pair-open">Allow a new app</button></div>
+        <div id="apps-list"></div>
+      </div>
+      <p class="foot">Pause stops Claude using the shared browser: no looking, clicking or typing. Searching and reading public pages still work.</p>
+
+      <h2>Browser</h2>
+      <div class="group">
+        <div class="row"><span>Screen<span class="sub">Desktop is what Claude sees. Phone is for tapping and typing.</span></span>
+          <div class="seg" role="radiogroup" aria-label="Screen" id="seg-settings"><button role="radio" data-mode="desktop">Desktop</button><button role="radio" data-mode="phone">Phone</button></div></div>
+        <div class="row"><span>Theme<span class="sub" id="theme-msg" aria-live="polite">Changing it restarts the browser.</span></span>
+          <div class="seg" role="radiogroup" aria-label="Browser theme" id="seg-theme"><button role="radio" data-theme="dark">Dark</button><button role="radio" data-theme="light">Light</button></div></div>
+        <div class="row"><span>History<span class="sub" id="hist-msg" aria-live="polite">Cleared on every start. Saved logins stay.</span></span><button class="btn" id="hist-clear">Clear now</button></div>
+      </div>
+
+      <h2>Keep for</h2>
+      <div class="group">
+        <div class="row"><span>Action log<span class="sub" id="log-msg" aria-live="polite">What Claude did and when. No searches or page text.</span></span>
+          <span class="tools"><button class="btn" id="log-clear">Clear</button>
+          <select class="btn" id="log-days" aria-label="Keep the log for"><option value="1">1 day</option><option value="3">3 days</option><option value="7">7 days</option><option value="14">14 days</option><option value="30">30 days</option></select></span></div>
+        <div class="row"><span>Downloads and uploads<span class="sub">Then they delete themselves.</span></span>
+          <select class="btn" id="files-days" aria-label="Keep files for"><option value="1">1 day</option><option value="3">3 days</option><option value="7">7 days</option><option value="14">14 days</option><option value="30">30 days</option></select></div>
+      </div>
+
+      <h2>Self-test</h2>
+      <div class="group">
+        <div class="row"><span>Door, search, DNS, the wall, sandbox<span class="sub" id="st-msg" aria-live="polite">About 10 seconds. Changes nothing.</span></span>
+          <span class="tools"><button class="btn" id="st-copy" disabled>Copy</button><button class="btn" id="st-run">Run</button></span></div>
+        <div id="st-results"></div>
+      </div>
+
+      <h2>Search</h2>
+      <div class="group"><div class="row"><span>Your private search engine<span class="sub">Opens as a normal website.</span></span><a class="btn" href="/search/" target="_blank" rel="noopener">Open</a></div></div>
+    </div>
+  </section>
+</main>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const live = '/live/vnc.html?path=live/websockify&autoconnect=1&resize=remote&reconnect=1';
+  const views = ['browser', 'log', 'files', 'settings'];
+  const pages = { browser: 'f-browser', log: 'log', files: 'files', settings: 'settings' };
+  const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
+
+  async function api(path, opts) {
+    const r = await fetch(path, Object.assign({ cache: 'no-store' }, opts || {}));
+    return r.json();
+  }
+  const post = (path, body) => api(path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body || {}) });
+  const flash = (id, text, back) => { const n = $(id); n.textContent = text; setTimeout(() => { if (n.textContent === text) n.textContent = back; }, 3500); };
+
+  /* Destructive buttons ask twice, in place: the first tap arms, the second runs. */
+  function twoStep(btn, run) {
+    const label = btn.textContent; let timer;
+    btn.onclick = () => {
+      if (!btn.classList.contains('armed')) {
+        btn.classList.add('armed'); btn.textContent = 'Sure?';
+        timer = setTimeout(() => { btn.classList.remove('armed'); btn.textContent = label; }, 3000);
+        return;
+      }
+      clearTimeout(timer); btn.classList.remove('armed'); btn.textContent = label; run();
+    };
+  }
+
+  /* ---------- live view: the shared Chrome has one screen.
+     Desktop (default): the screen takes your window's size, never narrower than 1100px, so sites show their desktop layout to
+     Claude, and a smaller window (a phone) shrinks the view to fit. Phone: 504px wide (Chrome cannot be narrower), shrunk to fit. */
+  let mode = 'desktop';
+  try { if (localStorage.getItem('view') === 'phone') mode = 'phone'; } catch (e) {}
+  function fitLive() {
+    const f = $('f-browser'), box = f.parentElement, w = box.clientWidth, h = box.clientHeight;
+    for (const seg of [$('seg-menu'), $('seg-settings')]) for (const b of seg.children) b.setAttribute('aria-checked', b.dataset.mode === mode);
+    if (!w || !h) return;
+    const phone = mode === 'phone';
+    let W, H, k;
+    if (phone) { W = 504; k = Math.min(w / W, 1.3); H = Math.round(h / k); }
+    else {
+      k = w < 1100 ? w / 1100 : w > 2200 ? w / 2200 : 1;
+      W = Math.round(w / k); H = Math.max(600, Math.min(1600, Math.round(h / k)));
+      k = Math.min(k, h / H);
+    }
+    const left = Math.round((w - W * k) / 2), top = (phone || w < 700) ? 0 : Math.round((h - H * k) / 2);
+    f.style.cssText = 'left:' + left + 'px;top:' + top + 'px;width:' + W + 'px;height:' + H + 'px;transform:scale(' + k + ');transform-origin:0 0';
+  }
+  function setMode(m) { mode = m; try { localStorage.setItem('view', m); } catch (e) {} fitLive(); }
+  for (const seg of [$('seg-menu'), $('seg-settings')]) seg.onclick = (e) => { const b = e.target.closest('button'); if (b) setMode(b.dataset.mode); };
+  new ResizeObserver(() => requestAnimationFrame(fitLive)).observe($('f-browser').parentElement);
+
+  /* Phones have no keyboard for the live view until it asks for one: focus noVNC's own hidden input (same site, so allowed). */
+  $('kbd-btn').onclick = () => {
+    try { const k = $('f-browser').contentDocument.getElementById('noVNC_keyboardinput'); if (k) k.focus(); } catch (e) {}
+  };
+
+  /* ---------- menu and views */
+  let current = 'browser';
+  function show(name) {
+    if (!views.includes(name)) name = 'browser';
+    current = name; document.body.dataset.view = name;
+    for (const v of views) {
+      $(pages[v]).hidden = v !== name;
+      const item = document.querySelector('.item[data-go="' + v + '"]');
+      if (v === name) item.setAttribute('aria-current', 'page'); else item.removeAttribute('aria-current');
+    }
+    if (name === 'browser') { fitLive(); if (!$('f-browser').src) $('f-browser').src = live; }
+    if (name === 'log') loadLog();
+    if (name === 'files') loadFiles();
+    if (name === 'settings') loadSettings();
+    schedule();
+    try { localStorage.setItem('tab', name); } catch (e) {}
+    history.replaceState(null, '', '#' + name);
+  }
+  $('menu').addEventListener('click', (e) => { const b = e.target.closest('.item[data-go]'); if (b) { show(b.dataset.go); $('menu').hidePopover(); } });
+  $('menu').addEventListener('toggle', (e) => $('menu-btn').setAttribute('aria-expanded', e.newState === 'open'));
+  $('menu').addEventListener('keydown', (e) => {   // arrow keys move between the items
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    const items = [...$('menu').querySelectorAll('.item')], i = items.indexOf(document.activeElement);
+    items[(i + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length].focus();
+    e.preventDefault();
+  });
+  $('menu').addEventListener('beforetoggle', (e) => {
+    if (e.newState === 'open') requestAnimationFrame(() => (document.querySelector('.item[aria-current="page"]') || document.querySelector('.item')).focus());
+  });
+
+  /* ---------- log */
+  async function loadLog() {
+    const box = $('log-list');
+    try {
+      const d = await api('/api/log');
+      box.replaceChildren();
+      if (!d.lines.length) {
+        const e = el('div', 'empty group'); e.append(el('b', '', 'Nothing yet'), 'When Claude opens a page or clicks, it shows up here.');
+        box.append(e); return;
+      }
+      const today = new Date().toLocaleDateString('en-CA'), yest = new Date(Date.now() - 864e5).toLocaleDateString('en-CA');
+      let day = '', group = null;
+      const frag = document.createDocumentFragment();
+      for (const line of d.lines) {
+        const m = /^(\d{4}-\d\d-\d\d) (\d\d:\d\d:\d\d) (.*)$/.exec(line);
+        if (!m) continue;
+        if (m[1] !== day) {
+          day = m[1];
+          frag.append(el('div', 'day', day === today ? 'Today' : day === yest ? 'Yesterday' : new Date(day + 'T12:00').toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })));
+          group = el('div', 'group'); frag.append(group);
+        }
+        const row = el('div', 'entry'); row.append(el('time', '', m[2]), el('span', '', m[3])); group.append(row);
+      }
+      box.append(frag);
+    } catch (e) { box.textContent = 'Could not load the log.'; }
+  }
+
+  /* ---------- files */
+  const size = (n) => n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(0) + ' KB' : (n / 1048576).toFixed(1) + ' MB';
+  const ago = (t) => { const m = Math.max(0, Math.round((Date.now() / 1000 - t) / 60)); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : Math.round(m / 1440) + ' d ago'; };
+  function fileRow(kind, f) {
+    const row = el('div', 'file'), nm = el('div', 'nm');
+    nm.append(el('div', '', f.name), el('span', 'sub', size(f.size) + ' \u00b7 ' + ago(f.modified))); row.append(nm);
+    const url = '/api/files/' + kind + '/' + encodeURIComponent(f.name);
+    if (kind === 'downloads') { const a = el('a', 'btn', 'Save'); a.href = url; a.download = f.name; row.append(a); }
+    const del = el('button', 'btn', 'Delete'); twoStep(del, async () => { await api(url, { method: 'DELETE' }); loadFiles(); }); row.append(del);
+    return row;
+  }
+  function fillList(box, kind, list, emptyText) {
+    box.replaceChildren();
+    if (!list.length) { box.append(el('div', 'empty group', emptyText)); return; }
+    const g = el('div', 'group'); for (const f of list) g.append(fileRow(kind, f)); box.append(g);
+  }
+  async function loadFiles() {
+    try {
+      const d = await api('/api/files');
+      fillList($('dl-list'), 'downloads', d.downloads, 'Nothing downloaded yet.');
+      fillList($('up-list'), 'uploads', d.uploads, 'No uploads yet.');
+      $('files-note').textContent = 'Kept ' + d.keep_days + ' days, up to ' + d.max_mb + ' MB each. Programs and scripts are refused.';
+    } catch (e) { $('dl-list').textContent = 'Could not load files.'; }
+  }
+  async function sendFiles(list) {
+    if (!list.length) return;
+    const body = new FormData(); for (const f of list) body.append('file', f);
+    $('up-msg').textContent = 'Uploading\u2026';
+    try {
+      const d = await (await fetch('/api/files/upload', { method: 'POST', body })).json();
+      const bits = [];
+      if (d.saved && d.saved.length) bits.push(d.saved.length + (d.saved.length === 1 ? ' file' : ' files') + ' added.');
+      if (d.errors && d.errors.length) bits.push(d.errors.join(' '));
+      $('up-msg').textContent = bits.join(' ') || d.error || 'Nothing was added.';
+    } catch (e) { $('up-msg').textContent = 'Upload failed.'; }
+    $('up-input').value = ''; loadFiles();
+  }
+  $('up-input').onchange = (e) => sendFiles([...e.target.files]);
+  for (const t of ['dragenter', 'dragover']) $('drop').addEventListener(t, (e) => { e.preventDefault(); $('drop').classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) $('drop').addEventListener(t, (e) => { e.preventDefault(); $('drop').classList.remove('over'); });
+  $('drop').addEventListener('drop', (e) => sendFiles([...e.dataTransfer.files]));
+
+  /* ---------- settings: everything the page needs arrives in one parallel round */
+  async function loadSettings() {
+    try {
+      const [s, apps, pair] = await Promise.all([api('/api/settings'), api('/api/apps'), api('/api/pairing')]);
+      $('log-days').value = String(s.log_keep_days);
+      $('files-days').value = String(s.files_keep_days);
+      for (const b of $('seg-theme').children) b.setAttribute('aria-checked', b.dataset.theme === s.browser_theme);
+      renderApps(apps.apps); paintPairing(pair);
+    } catch (e) {}
+  }
+  $('log-days').onchange = async (e) => { await post('/api/settings', { log_keep_days: Number(e.target.value) }); flash('log-msg', 'Saved.', 'What Claude did and when. No searches or page text.'); };
+  $('files-days').onchange = (e) => post('/api/settings', { files_keep_days: Number(e.target.value) });
+  twoStep($('log-clear'), async () => { await post('/api/log/clear'); flash('log-msg', 'Log cleared.', 'What Claude did and when. No searches or page text.'); });
+  twoStep($('hist-clear'), async () => {
+    const m = $('hist-msg'); m.textContent = 'Restarting the browser\u2026';
+    try { const d = await post('/api/browser/clear-history'); m.textContent = d.ok ? 'Done. The browser is back in a few seconds.' : d.error || 'Failed.'; }
+    catch (e) { m.textContent = 'Failed.'; }
+    setTimeout(() => { m.textContent = 'Cleared on every start. Saved logins stay.'; }, 6000);
+  });
+  $('seg-theme').onclick = async (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    for (const x of $('seg-theme').children) x.setAttribute('aria-checked', x === b);
+    $('theme-msg').textContent = 'Restarting the browser\u2026';
+    try { await post('/api/settings', { browser_theme: b.dataset.theme }); const d = await post('/api/browser/restart'); $('theme-msg').textContent = d.ok ? 'Done. The browser is back in a few seconds.' : d.error || 'Failed.'; }
+    catch (err) { $('theme-msg').textContent = 'Failed.'; }
+    setTimeout(() => { $('theme-msg').textContent = 'Changing it restarts the browser.'; }, 6000);
+  };
+
+  /* connected apps, and the window in which a new app may connect */
+  function renderApps(list) {
+    const box = $('apps-list'); box.replaceChildren();
+    if (!list.length) { const r = el('div', 'row'); r.append(el('span', 'sub', 'No app is connected yet.')); box.append(r); return; }
+    for (const a of list) {
+      const row = el('div', 'row'), l = el('span', '', a.name);
+      l.append(el('span', 'sub', (a.signed_in ? 'Signed in' : 'Signed out') + (a.since ? ' \u00b7 added ' + new Date(a.since * 1000).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : '')));
+      const b = el('button', 'btn', 'Disconnect'); twoStep(b, async () => { await post('/api/apps/disconnect', { id: a.id }); loadSettings(); });
+      row.append(l, b); box.append(row);
+    }
+  }
+  let pairTimer;
+  function paintPairing(d) {
+    clearTimeout(pairTimer);
+    if (d.open) {
+      $('pair-msg').textContent = 'Open for ' + Math.floor(d.seconds_left / 60) + ':' + String(d.seconds_left % 60).padStart(2, '0') + '. Log in from the new app now.';
+      pairTimer = setTimeout(async () => paintPairing(await api('/api/pairing')), 1000);
+    } else $('pair-msg').textContent = 'A new app can only connect while this is open.';
+  }
+  $('pair-open').onclick = async () => paintPairing(await post('/api/pairing'));
+
+  /* self-test */
+  let lastReport = '';
+  $('st-copy').onclick = async () => {
+    if (!lastReport) return;
+    try { await navigator.clipboard.writeText(lastReport); $('st-msg').textContent = 'Copied. Paste it to Claude.'; }
+    catch (e) {   // clipboard blocked: show the text so it can be selected by hand
+      const ta = el('textarea'); ta.value = lastReport; ta.readOnly = true; ta.rows = 8;
+      ta.style.cssText = 'width:100%;font:12px/1.4 ui-monospace,Menlo,monospace;background:var(--bg);color:var(--fg);border:0;border-top:1px solid var(--line);padding:10px 14px;border-radius:0 0 var(--r) var(--r)';
+      $('st-results').prepend(ta); ta.select(); $('st-msg').textContent = 'Select all and copy this text.';
+    }
+  };
+  $('st-run').onclick = async () => {
+    const btn = $('st-run'), msg = $('st-msg'), box = $('st-results');
+    btn.disabled = true; $('st-copy').disabled = true; msg.textContent = 'Running the checks\u2026'; box.replaceChildren();
+    try {
+      const d = await api('/api/selftest');
+      msg.textContent = d.passed + ' of ' + d.total + ' passed in ' + d.seconds + ' s' + (d.ok ? '.' : '. Something failed. Copy it and paste it to Claude.');
+      lastReport = d.text; $('st-copy').disabled = false;
+      const frag = document.createDocumentFragment();
+      for (const r of d.results) {
+        const row = el('div', 'check'), t = el('span', '', r.name);
+        if (r.detail) t.append(el('span', 'sub', r.detail));
+        row.append(el('i', 'dot ' + (r.ok ? 'pass' : 'fail')), t); frag.append(row);
+      }
+      box.append(frag);
+    } catch (e) { msg.textContent = 'The self-test could not run.'; }
+    btn.disabled = false;
+  };
+
+  /* ---------- Claude's state and handoff (polls only while the page is visible) */
+  let asked = false, timer;
+  function paint(s) {
+    const cls = 'dot' + (s.paused || s.handoff ? ' paused' : s.working ? ' on' : '');
+    const label = s.paused ? 'Paused' : s.handoff ? 'Waiting for you' : s.working ? 'Working' : 'Idle';
+    for (const [d, t] of [['dot', 'state'], ['dot-top', 'state-top']]) { $(d).className = cls; $(t).textContent = label; }
+    $('status-btn').setAttribute('aria-label', 'Claude: ' + label + '. Open settings');
+    $('menu-pause-text').textContent = s.paused ? 'Resume Claude' : 'Pause Claude';
+    $('pause').textContent = s.paused ? 'Resume' : 'Pause';
+    $('pause').classList.toggle('primary', s.paused);
+    $('handoff').hidden = !s.handoff;
+    if (s.handoff) {
+      $('handoff-text').textContent = 'Claude asks: ' + s.handoff.message;
+      if (!asked) { asked = true; show('browser'); }
+    } else asked = false;
+  }
+  async function poll() { try { paint(await api('/api/status')); } catch (e) {} }
+  function schedule() {
+    clearInterval(timer);
+    if (!document.hidden) { poll(); timer = setInterval(poll, current === 'settings' ? 700 : 2000); }
+  }
+  document.addEventListener('visibilitychange', schedule);
+  $('status-btn').onclick = () => show('settings');
+  $('menu-pause').onclick = async () => { paint(await post('/api/pause')); $('menu').hidePopover(); };
+  $('pause').onclick = async () => paint(await post('/api/pause'));
+  $('handoff-done').onclick = async () => paint(await post('/api/handoff/done'));
+
+  let start = location.hash.slice(1);
+  if (!start) { try { start = localStorage.getItem('tab') || ''; } catch (e) {} }
+  show(start);   // last, so everything above exists
+</script>
+</body>
+</html>

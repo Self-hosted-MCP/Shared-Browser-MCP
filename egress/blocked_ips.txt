@@ -1,0 +1,2 @@
+# Filled at start from SERVER_PUBLIC_IP (see start.sh). Edits here are overwritten.
+192.0.2.1

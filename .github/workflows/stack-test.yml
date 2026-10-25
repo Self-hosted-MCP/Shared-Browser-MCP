@@ -1,0 +1,43 @@
+# Builds all six images and starts the whole stack on a fresh Linux machine, then runs scripts/smoke-test.sh against it.
+# Uses test values only. Slow (about 15 minutes), so it runs on pushes to main and by hand.
+name: Stack test
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stack:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1   # v7.0.1, pinned
+        with:
+          persist-credentials: false
+      - name: Test settings
+        run: |
+          {
+            echo "PUBLIC_URL=http://localhost:8765"
+            echo "FRONT_URL=http://localhost:8081"
+            echo "LOGIN_HASH=$(python3 -c 'import hashlib,os;s=os.urandom(16);print("pbkdf2:600000:"+s.hex()+":"+hashlib.pbkdf2_hmac("sha256",b"test-only-passphrase",s,600000).hex())')"
+            echo "SEARXNG_SECRET=$(openssl rand -hex 32)"
+            echo "ACCESS_ENFORCE=0"
+          } > .env.local
+      - name: Build and start
+        run: docker compose -p shared-browser -f docker-compose.yml -f docker-compose.local.yml --env-file .env.local up -d --build
+      - name: Wait for the stack
+        run: |
+          for i in $(seq 1 60); do
+            curl -fsS http://127.0.0.1:8765/health >/dev/null 2>&1 && exit 0
+            sleep 5
+          done
+          echo "mcp did not answer in 5 minutes"; exit 1
+      - name: Smoke test
+        run: bash scripts/smoke-test.sh shared-browser
+      - name: Logs on failure
+        if: failure()
+        run: docker compose -p shared-browser -f docker-compose.yml -f docker-compose.local.yml --env-file .env.local logs --tail 80

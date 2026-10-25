@@ -1,0 +1,20 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "uv"
+    directory: "/mcp"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "docker"
+    directories: ["/browser", "/dns", "/egress", "/front", "/mcp", "/searxng"]
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7

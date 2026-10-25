@@ -1,0 +1,157 @@
+# SERVER file: pulls the six ready-made images from ghcr.io/self-hosted-mcp and builds nothing.
+# The page and the door are published on the server's own loopback only (127.0.0.1:8081 and 127.0.0.1:8765), and a
+# Cloudflare tunnel points at them. Keep it in step with docker-compose.yml. browser/seccomp.json is read from this folder.
+#   front -> your page              (port 80,   behind Cloudflare Zero Trust)
+#   mcp   -> the AI app's door      (port 8765, public, passphrase login)
+# Settings come from .env or your server panel. See .env.example and docs/setup-own-server.md.
+name: shared-browser
+
+x-logs: &logs
+  driver: json-file
+  options: { max-size: "10m", max-file: "3" }
+
+# Every service uses our own DNS container, so lookups are never logged.
+x-dns: &dns
+  dns: ["10.88.251.53"]
+
+services:
+  dns:
+    image: ghcr.io/self-hosted-mcp/shared-browser-dns:latest
+    pull_policy: always
+    restart: unless-stopped
+    cpus: 0.25
+    mem_limit: 384m
+    networks:
+      default:
+        ipv4_address: 10.88.251.53
+    logging: *logs
+
+  searxng:
+    <<: *dns
+    image: ghcr.io/self-hosted-mcp/shared-browser-searxng:latest
+    pull_policy: always
+    restart: unless-stopped
+    environment:
+      SEARXNG_SECRET: ${SEARXNG_SECRET:?set SEARXNG_SECRET}
+    networks: [default, wall]
+    logging: *logs
+
+  # The browser's only way out: a filter that refuses every private address and keeps no log.
+  egress:
+    <<: *dns
+    image: ghcr.io/self-hosted-mcp/shared-browser-egress:latest
+    pull_policy: always
+    restart: unless-stopped
+    environment:
+      SERVER_PUBLIC_IP: ${SERVER_PUBLIC_IP:-}   # your server's public address(es), comma separated
+    cpus: 0.5
+    mem_limit: 256m
+    tmpfs:
+      - /var/log/squid:uid=13,gid=13
+    networks: [default, wall]
+    logging: *logs
+
+  # Chromium + screen + live view. On the wall network only: no direct internet, no way to our other containers.
+  browser:
+    <<: *dns
+    image: ghcr.io/self-hosted-mcp/shared-browser-browser:latest
+    pull_policy: always
+    restart: unless-stopped
+    hostname: browser
+    shm_size: 2gb
+    cpus: 2
+    mem_limit: 5g
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+      - seccomp=./browser/seccomp.json   # blocks dangerous system calls, allows what Chromium's own sandbox needs
+    pids_limit: 900
+    read_only: true
+    tmpfs:
+      - /tmp:mode=1777,size=512m
+      - /run
+      - /var/tmp
+      - /home/browser/.config:uid=1000,gid=1000
+      - /home/browser/.cache:uid=1000,gid=1000
+      - /home/browser/.pki:uid=1000,gid=1000
+      - /home/browser/.local:uid=1000,gid=1000
+    environment:
+      CHROME_NO_SANDBOX: ${CHROME_NO_SANDBOX:-0}
+      TZ: ${TZ:-UTC}   # the browser's clock, so sites see one steady timezone
+    volumes:
+      - browser-profile:/home/browser/profile
+      - work:/home/browser/work
+      - uploads:/home/browser/work/uploads:ro     # what the user drops on the Files page, readable by Claude
+      - downloads:/home/browser/work/downloads:ro # what the browser downloaded
+      - downloads:/files/downloads
+      - ctl:/state:ro
+    depends_on: [egress, searxng]
+    networks: [wall]
+    logging: *logs
+
+  # The user's page: Browser, Log, Files, Settings.
+  front:
+    <<: *dns
+    image: ghcr.io/self-hosted-mcp/shared-browser-front:latest
+    pull_policy: always
+    ports: ["127.0.0.1:8081:80"]
+    restart: unless-stopped
+    cpus: 0.25
+    mem_limit: 64m
+    depends_on: [browser, searxng, mcp]
+    networks: [default, wall]
+    logging: *logs
+
+  # Claude's door (/mcp, /login) on 8765. The user's admin API sits on 8766 and is reached only through front.
+  mcp:
+    <<: *dns
+    image: ghcr.io/self-hosted-mcp/shared-browser-mcp:latest
+    pull_policy: always
+    ports: ["127.0.0.1:8765:8765"]
+    restart: unless-stopped
+    cpus: 1
+    mem_limit: 512m
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      PUBLIC_URL: ${PUBLIC_URL:?set PUBLIC_URL}
+      FRONT_URL: ${FRONT_URL:?set FRONT_URL}
+      ALLOWED_REDIRECT_HOSTS: ${ALLOWED_REDIRECT_HOSTS:-claude.ai,claude.com}
+      LOGIN_HASH: ${LOGIN_HASH:?set LOGIN_HASH}
+      SEARXNG_URL: http://searxng:8080
+      PAGESPEED_API_KEY: ${PAGESPEED_API_KEY:-}
+      TZ: ${TZ:-UTC}
+      ACCESS_ENFORCE: ${ACCESS_ENFORCE:-1}
+      CF_ACCESS_TEAM_DOMAIN: ${CF_ACCESS_TEAM_DOMAIN:-}
+      CF_ACCESS_AUD: ${CF_ACCESS_AUD:-}
+    volumes:
+      - mcp-data:/data
+      - ctl:/ctl
+      - downloads:/files/downloads
+      - uploads:/files/uploads
+    depends_on: [searxng]
+    networks:
+      default: {}
+      wall:
+        ipv4_address: 10.88.250.10   # the only address allowed to use the browser's DevTools port
+    logging: *logs
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 10.88.251.0/24
+  wall:
+    internal: true
+    ipam:
+      config:
+        - subnet: 10.88.250.0/24
+
+volumes:
+  browser-profile:
+  work:            # the browser's working folder (uploads are mounted inside it)
+  mcp-data:
+  ctl:   # one tiny file (the browser theme): all the browser container may read
+  downloads:
+  uploads:

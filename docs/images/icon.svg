@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Shared-Browser-MCP icon">
+  <rect width="512" height="512" rx="112" fill="#0d0f14"/>
+  <rect x="96" y="128" width="320" height="256" rx="28" fill="none" stroke="#d7dae0" stroke-width="24"/>
+  <line x1="96" y1="196" x2="416" y2="196" stroke="#d7dae0" stroke-width="24"/>
+  <circle cx="136" cy="162" r="12" fill="#d97757"/>
+  <circle cx="176" cy="162" r="12" fill="#d7dae0"/>
+  <circle cx="226" cy="292" r="46" fill="none" stroke="#d97757" stroke-width="22"/>
+  <line x1="260" y1="326" x2="308" y2="374" stroke="#d97757" stroke-width="24" stroke-linecap="round"/>
+</svg>

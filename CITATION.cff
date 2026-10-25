@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use or build on this project, please credit it like this."
+title: "Shared-Browser-MCP"
+type: software
+authors:
+  - name: "Self-hosted-MCP"
+repository-code: "https://github.com/Self-hosted-MCP/Shared-Browser-MCP"
+license: Apache-2.0
+version: 0.1.0
+date-released: "2026-10-25"
+abstract: "One private connector for your AI app: web search with your own SearXNG, a page and PDF reader, and a shared Chrome you can watch and take over, on your own server."
+keywords: [mcp, self-hosted, searxng, browser, chromium, privacy, ai-agents]

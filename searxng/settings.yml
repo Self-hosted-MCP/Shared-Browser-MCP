@@ -1,0 +1,35 @@
+use_default_settings: true
+general:
+  instance_name: "Shared Browser Search"
+  enable_metrics: false
+search:
+  safe_search: 0
+  autocomplete: ""
+  formats: [html, json]
+server:
+  limiter: false
+  public_instance: false
+  image_proxy: true
+  method: "POST"
+outgoing:
+  request_timeout: 6
+  max_request_timeout: 8
+# Only the engines that answer from the server without a CAPTCHA. Fewer engines also means a faster page.
+engines:
+  - name: duckduckgo
+    disabled: true
+  - name: wikipedia
+    disabled: true
+
+ui:
+  query_in_title: false
+
+# Settings other apps on the same host (localhost) could collide with are fixed here, so a stray cookie such as theme=dark
+# cannot make the page say "Invalid settings". The values come from this file.
+preferences:
+  lock:
+    - theme
+    - language
+    - locale
+    - autocomplete
+    - safesearch

@@ -1,0 +1,12 @@
+# For trying it on a Mac: adds localhost ports. Run:
+#   docker compose -f docker-compose.yml -f docker-compose.local.yml --env-file .env.local up -d --build
+# Then open http://localhost:8081 (page) and http://localhost:8765 (Claude's door).
+services:
+  searxng:
+    ports: ["127.0.0.1:8080:8080"]
+  front:
+    ports: ["127.0.0.1:8081:80"]
+  mcp:
+    ports: ["127.0.0.1:8765:8765"]
+    environment:
+      ACCESS_ENFORCE: "0"   # no Cloudflare in front on a Mac
