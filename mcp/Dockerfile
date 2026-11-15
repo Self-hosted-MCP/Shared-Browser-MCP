@@ -1,6 +1,6 @@
 # The door (mcp): the MCP server your AI app connects to, plus the owner page's admin API on 8766.
 # Python with uv, dependencies before code, non-root user, health check on /health. Works on amd64 and arm64.
-FROM python:3.14-slim-bookworm@sha256:945c2676dc2b18e0c1f16879244122c57c0ffede60006bf3df159c507a31bcae
+FROM python:3.15-slim-bookworm@sha256:96599df822d0e1c6bb700014a05c7f3c8cabc6e0f7ff3c4f9f69cee033b4b5d9
 COPY --from=ghcr.io/astral-sh/uv:0.11.19 /uv /bin/uv
 WORKDIR /app
 COPY pyproject.toml uv.lock README.md LICENSE ./
